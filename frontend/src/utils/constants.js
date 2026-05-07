@@ -1,0 +1,180 @@
+// Bharat Shield Theme Colors
+export const COLORS = {
+  bgBase: '#030810',
+  bgCard: 'rgba(4,14,30,0.9)',
+  bgElevated: 'rgba(8,20,45,0.8)',
+  saffron: '#FF6B00',
+  saffronBright: '#FF9933',
+  saffronGlow: 'rgba(255,107,0,0.4)',
+  indiaBlueBright: '#2979FF',
+  indiaBlue: '#1565C0',
+  panicRed: '#FF2D55',
+  highOrange: '#FF6B2B',
+  mediumYellow: '#FFD60A',
+  calmGreen: '#00E676',
+  textPrimary: '#F5F0FF',
+  textSecondary: '#7B8FA8',
+}
+
+// Emotion levels
+export const EMOTION_LEVELS = {
+  calm: { color: '#00E676', label: 'CALM', priority: 1 },
+  concerned: { color: '#FFD60A', label: 'CONCERNED', priority: 2 },
+  distressed: { color: '#FF6B2B', label: 'DISTRESSED', priority: 3 },
+  panic: { color: '#FF2D55', label: 'PANIC', priority: 4 },
+}
+
+// Intent types
+export const INTENT_TYPES = {
+  domestic_violence: { label: 'Domestic Violence', color: '#FF2D55' },
+  sexual_harassment: { label: 'Sexual Harassment', color: '#FF6B2B' },
+  stalking: { label: 'Stalking', color: '#FFD60A' },
+  dowry_harassment: { label: 'Dowry Harassment', color: '#FF9933' },
+  child_abuse: { label: 'Child Abuse', color: '#2979FF' },
+  trafficking: { label: 'Trafficking', color: '#EC4899' },
+  general_distress: { label: 'General Distress', color: '#8B5CF6' },
+  information_request: { label: 'Information', color: '#6B7280' },
+  unknown: { label: 'Unknown', color: '#374151' },
+}
+
+// Demo credentials
+export const DEMO_CREDENTIALS = [
+  {
+    email: 'agent@raksha.gov.in',
+    password: 'Raksha@1092',
+    name: 'Pratik Pisal',
+    role: 'Senior Agent',
+    id: 'AGT001',
+    avatar: 'PP',
+  },
+  {
+    email: 'supervisor@raksha.gov.in',
+    password: 'Super@1092',
+    name: 'Raman Yadav',
+    role: 'Supervisor',
+    id: 'SUP001',
+    avatar: 'RY',
+  },
+  {
+    email: 'admin@raksha.gov.in',
+    password: 'Admin@1092',
+    name: 'Anita Desai',
+    role: 'Admin',
+    id: 'ADM001',
+    avatar: 'AD',
+  },
+]
+
+// Local storage keys
+export const STORAGE_KEYS = {
+  auth: 'raksha_auth',
+  agent: 'raksha_agent',
+  introSeen: 'raksha_intro_seen',
+}
+
+// API endpoints
+export const API_ROUTES = {
+  cases: '/api/cases',
+  dashboard: '/api/dashboard',
+  demo: '/api/demo',
+  webhook: '/webhook',
+}
+
+// Demo sample cases
+export const SAMPLE_CASES = [
+  {
+    id: 'RK20240115A1',
+    caller_phone: '+91XXXXX0001',
+    language_detected: 'hindi',
+    emotion_level: 'panic',
+    emotion_score: 0.92,
+    intent_type: 'domestic_violence',
+    location_area: 'Koramangala',
+    location_city: 'Bangalore',
+    location_lat: 12.9352,
+    location_lng: 77.6245,
+    priority: 'critical',
+    status: 'dispatched',
+    ai_summary: 'Woman in immediate danger from domestic violence',
+    raw_transcript: 'Bachao bachao mera pati maar raha hai Koramangala mein hoon',
+    sms_sent: true,
+    help_dispatched: true,
+    created_at: new Date(Date.now() - 45000).toISOString(),
+  },
+  {
+    id: 'RK20240115B2',
+    caller_phone: '+91XXXXX0002',
+    language_detected: 'kannada',
+    emotion_level: 'distressed',
+    emotion_score: 0.71,
+    intent_type: 'stalking',
+    location_area: 'Indiranagar',
+    location_city: 'Bangalore',
+    location_lat: 12.9784,
+    location_lng: 77.6408,
+    priority: 'high',
+    status: 'processing',
+    ai_summary: 'Woman being followed from office',
+    raw_transcript: 'Nanna hatra yaaro follow madthaidaare Indiranagar alli',
+    sms_sent: false,
+    help_dispatched: false,
+    created_at: new Date(Date.now() - 300000).toISOString(),
+  },
+  {
+    id: 'RK20240115C3',
+    caller_phone: '+91XXXXX0003',
+    language_detected: 'hinglish',
+    emotion_level: 'concerned',
+    emotion_score: 0.45,
+    intent_type: 'sexual_harassment',
+    location_area: 'Whitefield',
+    location_city: 'Bangalore',
+    location_lat: 12.9698,
+    location_lng: 77.7500,
+    priority: 'medium',
+    status: 'pending_verification',
+    ai_summary: 'Workplace harassment complaint',
+    raw_transcript: 'Mere office mein ek colleague hai jo mujhe har roz harass karta hai',
+    sms_sent: false,
+    help_dispatched: false,
+    created_at: new Date(Date.now() - 720000).toISOString(),
+  },
+  {
+    id: 'RK20240115D4',
+    caller_phone: '+91XXXXX0004',
+    language_detected: 'kannada',
+    emotion_level: 'distressed',
+    emotion_score: 0.68,
+    intent_type: 'domestic_violence',
+    location_area: 'Jayanagar',
+    location_city: 'Bangalore',
+    location_lat: 12.9250,
+    location_lng: 77.5938,
+    priority: 'high',
+    status: 'human_escalated',
+    ai_summary: 'Domestic violence case escalated to human agent',
+    raw_transcript: 'Nanna ganda nanu hodeyuttaare Jayanagar alli idini',
+    sms_sent: true,
+    help_dispatched: false,
+    created_at: new Date(Date.now() - 1080000).toISOString(),
+  },
+  {
+    id: 'RK20240115E5',
+    caller_phone: '+91XXXXX0005',
+    language_detected: 'english',
+    emotion_level: 'calm',
+    emotion_score: 0.15,
+    intent_type: 'information_request',
+    location_area: 'HSR Layout',
+    location_city: 'Bangalore',
+    location_lat: 12.9116,
+    location_lng: 77.6389,
+    priority: 'low',
+    status: 'resolved',
+    ai_summary: 'Caller requesting information about legal aid',
+    raw_transcript: 'I want to know about the legal process for filing a complaint',
+    sms_sent: true,
+    help_dispatched: false,
+    created_at: new Date(Date.now() - 1500000).toISOString(),
+  },
+]

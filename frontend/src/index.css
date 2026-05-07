@@ -1,0 +1,198 @@
+/* Import fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base styles */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #030810;
+  color: #F5F0FF;
+  font-family: 'Inter', system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(4,14,30,0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 107, 0, 0.2);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 107, 0, 0.4);
+}
+
+@layer base {
+  body {
+    @apply bg-[#030810] text-[#F5F0FF];
+    background-image: 
+      radial-gradient(circle at 50% 50%, rgba(255, 107, 0, 0.03) 0%, transparent 70%),
+      linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    background-size: 100% 100%, 40px 40px, 40px 40px;
+  }
+}
+
+.cyber-card {
+  background: var(--card-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glow-orange);
+  position: relative;
+  overflow: hidden;
+}
+
+.cyber-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-orange), transparent);
+  opacity: 0.5;
+}
+
+.radar-sweep {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(rgba(255, 107, 0, 0.1) 0%, transparent 100%);
+  border-top: 1px solid rgba(255, 107, 0, 0.5);
+  animation: sweep 4s linear infinite;
+  pointer-events: none;
+  z-index: 10;
+}
+
+@keyframes sweep {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(100%); }
+}
+
+.neon-text-orange {
+  text-shadow: 0 0 10px rgba(255, 107, 0, 0.5);
+}
+
+.neon-text-red {
+  text-shadow: 0 0 10px rgba(255, 45, 85, 0.5);
+}
+
+/* Custom animations for RAKSHA AI */
+@keyframes tricolor-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(1); opacity: 0.5; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+
+@keyframes breathing-glow {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+@keyframes circuit-travel {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100vw); }
+}
+
+@keyframes float-particle {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(10px, -10px); }
+  50% { transform: translate(-5px, 15px); }
+  75% { transform: translate(-15px, -5px); }
+}
+
+@keyframes chakra-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes text-shimmer {
+  0% { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+
+.tricolor-line {
+  background: linear-gradient(90deg,
+    transparent 0%,
+    #FF9933 20%,
+    #FFFFFF 50%,
+    #138808 80%,
+    transparent 100%);
+  background-size: 200% 100%;
+  animation: tricolor-shimmer 4s linear infinite;
+}
+
+.text-shimmer {
+  background: linear-gradient(90deg, #FF9933, #FFFFFF, #FF9933);
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: text-shimmer 3s linear infinite;
+}
+
+.chakra-spin {
+  animation: chakra-rotate 60s linear infinite;
+}
+
+.breathing-glow {
+  animation: breathing-glow 3s ease-in-out infinite;
+}
+
+/* Glassmorphism card */
+.glass-card {
+  background: rgba(4,14,30,0.85);
+  border: 1px solid rgba(255,107,0,0.15);
+  border-radius: 16px;
+  backdrop-filter: blur(20px);
+  box-shadow:
+    0 0 0 1px rgba(255,107,0,0.05),
+    0 20px 40px rgba(0,0,0,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.04);
+  transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+
+.glass-card:hover {
+  transform: translateY(-5px) scale(1.01);
+  border-color: rgba(255,107,0,0.4);
+  box-shadow: 0 0 40px rgba(255,107,0,0.15),
+              0 20px 60px rgba(0,0,0,0.6);
+}
+
+/* Typing cursor */
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.cursor-blink {
+  animation: blink 1s step-end infinite;
+}
+
+/* Selection color */
+::selection {
+  background: rgba(255,107,0,0.3);
+  color: #F5F0FF;
+}
