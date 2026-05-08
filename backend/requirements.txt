@@ -15,3 +15,5 @@ asyncpg
 greenlet
 aiosqlite
 spacy
+googlemaps
+httpx
