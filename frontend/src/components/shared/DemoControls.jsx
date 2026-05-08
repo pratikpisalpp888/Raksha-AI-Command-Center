@@ -108,7 +108,7 @@ export default function DemoControls() {
   const [status, setStatus] = useState('ready') // 'ready' | 'sending' | 'success' | 'error'
   const [statusMsg, setStatusMsg] = useState('')
 
-  const BASE_URL = 'http://localhost:8000'
+  const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
   // 📡 Listen for Live Cases via WebSocket to trigger automatic audio alerts
   useRakshaWebSocket({
