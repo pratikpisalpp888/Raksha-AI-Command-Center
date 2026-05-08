@@ -14,3 +14,4 @@ hume
 asyncpg
 greenlet
 aiosqlite
+spacy
