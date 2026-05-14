@@ -1,10 +1,10 @@
 import { motion } from "framer-motion"
-import { MapPin, Radio, RefreshCw, Layers } from "lucide-react"
+import { MapPin, Radio, RefreshCw, Layers, Shield } from "lucide-react"
 import { useEffect, useState, useCallback } from "react"
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet"
 import L from "leaflet"
 import "leaflet/dist/leaflet.css"
-import { getHeatmapData } from "../../services/api"
+import { getHeatmapData, getUnits } from "../../services/api"
 
 // Fix for default marker icons in Leaflet + React
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png"
@@ -22,11 +22,18 @@ L.Icon.Default.mergeOptions({
 const DEFAULT_CENTER: [number, number] = [19.0330, 73.0297]
 const DEFAULT_ZOOM = 12
 
-const severityColors = {
-  critical: "#FF2D55",
-  high: "#FF6B2B",
-  medium: "#FFD60A",
-  resolved: "#00E676",
+const emotionColors = {
+  panic: "#FF2D55",
+  distressed: "#FF6B2B",
+  concerned: "#FFD60A",
+  calm: "#00E676",
+  unknown: "#7B8FA8",
+}
+
+const unitColors = {
+  police: "#2979FF",
+  women_helpline: "#E040FB",
+  ambulance: "#FF5252",
 }
 
 // Custom pulse icon for active emergencies
@@ -49,6 +56,30 @@ const createPulseIcon = (color: string) => {
   })
 }
 
+// Icon for Police Stations / Units
+const createStationIcon = (color: string) => {
+  return L.divIcon({
+    className: "custom-station-icon",
+    html: `
+      <div style="
+        width: 22px; 
+        height: 22px; 
+        background-color: ${color}; 
+        border-radius: 6px; 
+        border: 2px solid white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 15px ${color};
+      ">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+    `,
+    iconSize: [22, 22],
+    iconAnchor: [11, 11],
+  })
+}
+
 // Component to handle map centering
 function ChangeView({ center, zoom }: { center: [number, number], zoom: number }) {
   const map = useMap()
@@ -60,6 +91,7 @@ function ChangeView({ center, zoom }: { center: [number, number], zoom: number }
 
 export function TacticalMap() {
   const [emergencies, setEmergencies] = useState<any[]>([])
+  const [units, setUnits] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
   const [mapCenter, setMapCenter] = useState<[number, number]>(DEFAULT_CENTER)
@@ -67,20 +99,25 @@ export function TacticalMap() {
 
   const fetchMarkers = useCallback(async () => {
     try {
-      const data = await getHeatmapData()
-      setEmergencies(data || [])
+      const [heatmap, unitsData] = await Promise.all([
+        getHeatmapData(),
+        getUnits()
+      ])
+      
+      setEmergencies(heatmap || [])
+      setUnits(unitsData || [])
       setLastUpdated(new Date())
       
       // If there's a new critical emergency, fly to it!
-      if (data && data.length > 0) {
-        const latest = data[0]
+      if (heatmap && heatmap.length > 0) {
+        const latest = heatmap[0]
         if (latest.lat && latest.lng) {
             setMapCenter([latest.lat, latest.lng])
             setMapZoom(14) // Tactical zoom in
         }
       }
     } catch (err) {
-      console.warn("[TacticalMap] Failed to fetch heatmap data")
+      console.warn("[TacticalMap] Failed to fetch map data")
     } finally {
       setLoading(false)
     }
@@ -167,11 +204,35 @@ export function TacticalMap() {
           
           <ChangeView center={mapCenter} zoom={mapZoom} />
 
+          {/* Unit Markers (Police Stations) */}
+          {units.map((unit) => (
+            <Marker
+              key={unit.id}
+              position={[unit.lat, unit.lng]}
+              icon={createStationIcon(unitColors[unit.type as keyof typeof unitColors] || "#2979FF")}
+            >
+              <Popup>
+                <div className="p-2 min-w-[140px]">
+                  <p className="text-[10px] font-black text-[#2979FF] mb-1 tracking-widest uppercase font-mono">SUPPORT UNIT</p>
+                  <p className="text-sm font-bold text-white mb-1 uppercase tracking-tight">{unit.name}</p>
+                  <div className="h-px w-full bg-white/10 my-2" />
+                  <div className="flex items-center justify-between">
+                    <span className="text-[9px] text-[#7B8FA8] font-bold uppercase tracking-widest">STATUS:</span>
+                    <span className={`text-[9px] font-bold uppercase ${unit.is_available ? 'text-[#00E676]' : 'text-[#FF2D55]'}`}>
+                      {unit.is_available ? 'Available' : 'On Mission'}
+                    </span>
+                  </div>
+                </div>
+              </Popup>
+            </Marker>
+          ))}
+
+          {/* Emergency Markers */}
           {emergencies.map((emer) => (
             <Marker
               key={emer.case_id}
               position={[emer.lat, emer.lng]}
-              icon={createPulseIcon(severityColors[emer.priority as keyof typeof severityColors] || "#FF9933")}
+              icon={createPulseIcon(emotionColors[emer.emotion as keyof typeof emotionColors] || "#FF9933")}
             >
               <Popup>
                 <div className="p-2 min-w-[120px]">
@@ -179,8 +240,8 @@ export function TacticalMap() {
                   <p className="text-sm font-bold text-white mb-1 uppercase tracking-tight">{emer.intent}</p>
                   <div className="h-px w-full bg-white/10 my-2" />
                   <p className="text-[9px] text-[#7B8FA8] font-bold uppercase tracking-widest flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: severityColors[emer.priority as keyof typeof severityColors] }} />
-                    PRIORITY: {emer.priority}
+                    <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: emotionColors[emer.emotion as keyof typeof emotionColors] }} />
+                    EMOTION: {emer.emotion}
                   </p>
                 </div>
               </Popup>
@@ -190,24 +251,41 @@ export function TacticalMap() {
       </div>
 
       {/* Legend */}
-      <motion.div 
-        initial={{ x: 20, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        className="absolute bottom-5 right-5 z-[500] bg-[#030810]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-2xl border-t-white/10"
-      >
-        <p className="text-[10px] font-black text-[#7B8FA8] mb-3 tracking-[0.3em] uppercase opacity-60">Threat Levels</p>
-        <div className="flex flex-col gap-3">
-          {Object.entries(severityColors).map(([level, color]) => (
-            <div key={level} className="flex items-center gap-3 group/item cursor-pointer">
-              <div className="relative">
-                <div className="w-2.5 h-2.5 rounded-full shadow-[0_0_8px_rgba(0,0,0,0.5)] transition-transform group-hover/item:scale-125" style={{ backgroundColor: color }} />
-                <div className="absolute inset-0 rounded-full blur-[4px] opacity-40 animate-pulse" style={{ backgroundColor: color }} />
+      <div className="absolute bottom-5 left-5 right-5 z-[500] pointer-events-none flex justify-between items-end">
+        {/* Left Legend: Emotions */}
+        <motion.div 
+          initial={{ x: -20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          className="bg-[#030810]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-3 shadow-2xl border-t-white/10 pointer-events-auto"
+        >
+          <p className="text-[8px] font-black text-[#7B8FA8] mb-2 tracking-[0.2em] uppercase opacity-60">Emergency Emotions</p>
+          <div className="flex gap-3">
+            {Object.entries(emotionColors).slice(0, 4).map(([level, color]) => (
+              <div key={level} className="flex items-center gap-1.5">
+                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: color }} />
+                <span className="text-[8px] text-white/70 font-bold uppercase">{level}</span>
               </div>
-              <span className="text-[10px] text-white font-bold uppercase tracking-[0.2em] group-hover/item:text-[#FF9933] transition-colors">{level}</span>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Right Legend: Units */}
+        <motion.div 
+          initial={{ x: 20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          className="bg-[#030810]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-3 shadow-2xl border-t-white/10 pointer-events-auto"
+        >
+          <p className="text-[8px] font-black text-[#7B8FA8] mb-2 tracking-[0.2em] uppercase opacity-60">Support Units</p>
+          <div className="flex gap-4">
+            <div className="flex items-center gap-1.5">
+              <div className="w-2.5 h-2.5 rounded bg-[#2979FF] flex items-center justify-center">
+                <Shield size={6} className="text-white" />
+              </div>
+              <span className="text-[8px] text-white font-bold uppercase">Police Station</span>
             </div>
-          ))}
-        </div>
-      </motion.div>
+          </div>
+        </motion.div>
+      </div>
 
       <style>{`
         @keyframes map-pulse {

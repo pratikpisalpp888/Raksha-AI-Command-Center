@@ -8,7 +8,7 @@ import asyncio
 import json
 
 from database.connection import get_db
-from database.models import Case
+from database.models import Case, DispatchUnit
 
 router = APIRouter(prefix="/api/dashboard", tags=["dashboard"])
 
@@ -18,6 +18,15 @@ class HeatmapItem(BaseModel):
     priority: str
     case_id: str
     intent: str
+    emotion: str
+
+class UnitItem(BaseModel):
+    id: str
+    name: str
+    type: str
+    lat: float
+    lng: float
+    is_available: bool
 
 # WebSocket connection manager
 class ConnectionManager:
@@ -59,6 +68,9 @@ class ConnectionManager:
             except Exception:
                 # Connection might be dead, it will be cleaned up by its own loop
                 pass
+
+    async def send_personal_message(self, message: str, websocket: WebSocket):
+        await websocket.send_text(message)
 
 manager = ConnectionManager()
 
@@ -123,12 +135,35 @@ async def get_heatmap_data(db: AsyncSession = Depends(get_db)):
                 lng=case.location_lng,
                 priority=case.priority,
                 case_id=case.id,
-                intent=case.intent_type
+                intent=case.intent_type,
+                emotion=case.emotion_level or "unknown"
             ))
         
         return items
     except Exception as e:
         print(f"⚠️ Heatmap Error: {e}")
+        return []
+
+@router.get("/units", response_model=List[UnitItem])
+async def get_units(db: AsyncSession = Depends(get_db)):
+    """Returns dispatch units/police stations."""
+    try:
+        stmt = select(DispatchUnit)
+        result = await db.execute(stmt)
+        units = result.scalars().all()
+        
+        return [
+            UnitItem(
+                id=u.id,
+                name=u.unit_name,
+                type=u.unit_type,
+                lat=u.current_lat,
+                lng=u.current_lng,
+                is_available=u.is_available
+            ) for u in units if u.current_lat and u.current_lng
+        ]
+    except Exception as e:
+        print(f"⚠️ Units Error: {e}")
         return []
 
 @router.websocket("/ws/live-updates")

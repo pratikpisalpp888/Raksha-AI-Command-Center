@@ -1,0 +1,209 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* RAKSHA AI - Bharat Shield Theme */
+  
+  /* Backgrounds */
+  --bg-base: #030810;
+  --bg-card: rgba(4,14,30,0.9);
+  --bg-elevated: rgba(8,20,45,0.8);
+  
+  /* Primary — Saffron (urgency + India identity) */
+  --saffron-bright: #FF6B00;
+  --saffron-glow: rgba(255,107,0,0.4);
+  --saffron-dim: rgba(255,107,0,0.15);
+  --saffron-border: rgba(255,107,0,0.3);
+  --amber: #FF8C00;
+  
+  /* Secondary — India Blue (trust + technology) */
+  --blue-bright: #1565C0;
+  --blue-neon: #2979FF;
+  --blue-glow: rgba(41,121,255,0.4);
+  --blue-dim: rgba(41,121,255,0.1);
+  
+  /* Emergency Colors */
+  --panic-red: #FF2D55;
+  --panic-glow: rgba(255,45,85,0.5);
+  --high-orange: #FF6B2B;
+  --medium-yellow: #FFD60A;
+  --calm-green: #00E676;
+  --calm-glow: rgba(0,230,118,0.4);
+  
+  /* Text */
+  --text-primary: #F5F0FF;
+  --text-secondary: #7B8FA8;
+  --text-dim: #3D5068;
+  
+  /* Special */
+  --tricolor-saffron: #FF9933;
+  --tricolor-white: #FFFFFF;
+  --tricolor-green: #138808;
+  --ashoka-blue: #000080;
+  
+  /* Standard shadcn tokens mapped to theme */
+  --background: #030810;
+  --foreground: #F5F0FF;
+  --card: rgba(4,14,30,0.9);
+  --card-foreground: #F5F0FF;
+  --popover: rgba(4,14,30,0.95);
+  --popover-foreground: #F5F0FF;
+  --primary: #FF6B00;
+  --primary-foreground: #030810;
+  --secondary: #2979FF;
+  --secondary-foreground: #F5F0FF;
+  --muted: rgba(8,20,45,0.8);
+  --muted-foreground: #7B8FA8;
+  --accent: #FF9933;
+  --accent-foreground: #030810;
+  --destructive: #FF2D55;
+  --destructive-foreground: #F5F0FF;
+  --border: rgba(255,107,0,0.15);
+  --input: rgba(255,107,0,0.1);
+  --ring: rgba(255,107,0,0.4);
+  --radius: 0.75rem;
+}
+
+@theme inline {
+  --font-sans: 'Inter', 'Geist', sans-serif;
+  --font-mono: 'Geist Mono', 'JetBrains Mono', monospace;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Custom animations for RAKSHA AI */
+@keyframes tricolor-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(1); opacity: 0.5; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+
+@keyframes breathing-glow {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+@keyframes circuit-travel {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100vw); }
+}
+
+@keyframes float-particle {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(10px, -10px); }
+  50% { transform: translate(-5px, 15px); }
+  75% { transform: translate(-15px, -5px); }
+}
+
+@keyframes chakra-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes text-shimmer {
+  0% { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+
+.tricolor-line {
+  background: linear-gradient(90deg,
+    transparent 0%,
+    #FF9933 20%,
+    #FFFFFF 50%,
+    #138808 80%,
+    transparent 100%);
+  background-size: 200% 100%;
+  animation: tricolor-shimmer 4s linear infinite;
+}
+
+.text-shimmer {
+  background: linear-gradient(90deg, #FF9933, #FFFFFF, #FF9933);
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: text-shimmer 3s linear infinite;
+}
+
+.chakra-spin {
+  animation: chakra-rotate 60s linear infinite;
+}
+
+.breathing-glow {
+  animation: breathing-glow 3s ease-in-out infinite;
+}
+
+/* Glassmorphism card */
+.glass-card {
+  background: rgba(4,14,30,0.85);
+  border: 1px solid rgba(255,107,0,0.15);
+  border-radius: 16px;
+  backdrop-filter: blur(20px);
+  box-shadow:
+    0 0 0 1px rgba(255,107,0,0.05),
+    0 20px 40px rgba(0,0,0,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.04);
+  transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+
+.glass-card:hover {
+  transform: translateY(-5px) scale(1.01);
+  border-color: rgba(255,107,0,0.4);
+  box-shadow: 0 0 40px rgba(255,107,0,0.15),
+              0 20px 60px rgba(0,0,0,0.6);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(4,14,30,0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255,107,0,0.3);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,107,0,0.5);
+}

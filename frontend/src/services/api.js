@@ -58,6 +58,7 @@ export const getLiveStats = () => api.get('/api/dashboard/live-stats')
  * Returns: Array of { lat, lng, priority, case_id, intent }
  */
 export const getHeatmapData = () => api.get('/api/dashboard/heatmap')
+export const getUnits = () => api.get('/api/dashboard/units')
 
 // ── Cases ────────────────────────────────────────────────────
 

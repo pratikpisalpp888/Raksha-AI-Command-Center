@@ -118,9 +118,9 @@ export function LiveStats() {
           </div>
         </div>
         
-        <div className="flex-1 h-[80px]">
+        <div className="flex-1 h-[100px]">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={callHistory}>
+            <LineChart data={callHistory} margin={{ top: 5, right: 10, left: 10, bottom: 5 }}>
               <Line 
                 type="monotone" 
                 dataKey="calls" 
@@ -159,16 +159,16 @@ export function LiveStats() {
           </div>
         </div>
         
-        <div className="flex-1 h-[80px]">
+        <div className="flex-1 h-[100px]">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={emotionData} layout="vertical">
+            <BarChart data={emotionData} layout="vertical" margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
               <XAxis type="number" hide />
               <YAxis dataKey="name" type="category" hide />
               <Tooltip 
                 contentStyle={{ background: '#030810', border: '1px solid #2979FF', fontSize: '10px' }}
                 itemStyle={{ color: '#F5F0FF' }}
               />
-              <Bar dataKey="value" radius={[0, 4, 4, 0]}>
+              <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={12}>
                 {emotionData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
