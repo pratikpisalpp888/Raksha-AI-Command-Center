@@ -238,6 +238,6 @@ export function LiveStats() {
           </AnimatePresence>
         </div>
       </motion.div>
-    </motion.div>
+    </div>
   )
 }
