@@ -49,6 +49,7 @@ async def process_emergency_call(case_data: dict, db: AsyncSession) -> dict:
         location_confidence=case_data.get("location_confidence", 0.95),
         priority=case_data.get("priority", "high"),
         ai_summary=case_data.get("ai_summary"),
+        notes=json.dumps(case_data.get("nearby_station")) if case_data.get("nearby_station") else None,
         status="new",
     )
     db.add(new_case)

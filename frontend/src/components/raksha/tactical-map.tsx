@@ -1,5 +1,5 @@
 import { motion } from "framer-motion"
-import { MapPin, Radio, RefreshCw, Layers, Shield } from "lucide-react"
+import { MapPin, Radio, RefreshCw, Shield } from "lucide-react"
 import { useEffect, useState, useCallback } from "react"
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet"
 import L from "leaflet"
@@ -19,7 +19,7 @@ L.Icon.Default.mergeOptions({
 })
 
 // Navi Mumbai Center
-const DEFAULT_CENTER: [number, number] = [19.0330, 73.0297]
+const DEFAULT_CENTER: [number, number] = [12.9716, 77.5946] // Central Bengaluru
 const DEFAULT_ZOOM = 12
 
 const emotionColors = {
@@ -95,12 +95,12 @@ export function TacticalMap() {
   const [emergencies, setEmergencies] = useState<any[]>([])
   const [units, setUnits] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
   const [mapCenter, setMapCenter] = useState<[number, number]>(DEFAULT_CENTER)
   const [mapZoom, setMapZoom] = useState(DEFAULT_ZOOM)
 
   const fetchMarkers = useCallback(async () => {
     try {
+      setLoading(true)
       const [heatmap, unitsData] = await Promise.all([
         getHeatmapData(),
         getUnits()
@@ -108,7 +108,6 @@ export function TacticalMap() {
       
       setEmergencies(heatmap || [])
       setUnits(unitsData || [])
-      setLastUpdated(new Date())
       
       // Auto-focus on the latest case if it's new
       if (heatmap && heatmap.length > 0) {
@@ -137,17 +136,9 @@ export function TacticalMap() {
 
   useEffect(() => {
     fetchMarkers()
-    
-    // Listen for real-time emergency events
-    const handleNewEmergency = () => {
-        fetchMarkers()
-    }
-    
+    const handleNewEmergency = () => fetchMarkers()
     window.addEventListener('raksha-emergency', handleNewEmergency)
-    
-    return () => {
-      window.removeEventListener('raksha-emergency', handleNewEmergency)
-    }
+    return () => window.removeEventListener('raksha-emergency', handleNewEmergency)
   }, [fetchMarkers])
 
   return (
@@ -164,13 +155,13 @@ export function TacticalMap() {
       {/* Radar Sweep Effect */}
       <div className="radar-sweep z-[401]" />
 
-      {/* Header */}
+      {/* Header Overlay */}
       <div className="absolute top-5 left-5 right-5 z-[500] pointer-events-none">
         <div className="flex items-center justify-between">
           <motion.div 
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="bg-[#030810]/90 backdrop-blur-xl border border-white/10 rounded-2xl px-5 py-3 flex items-center gap-4 pointer-events-auto shadow-[0_8px_32px_rgba(0,0,0,0.5)] border-t-white/20"
+            className="bg-[#030810]/90 backdrop-blur-xl border border-white/10 rounded-2xl px-5 py-3 flex items-center gap-4 pointer-events-auto shadow-2xl border-t-white/20"
           >
             <div className="relative">
               <Radio size={18} className="text-[#FF2D55] animate-pulse" />
@@ -209,22 +200,23 @@ export function TacticalMap() {
       </div>
 
       {/* Map Container */}
-      <div className="flex-1 w-full h-full grayscale-[0.85] contrast-[1.2] invert-[0.92] hue-rotate-[185deg] brightness-[0.8]">
+      <div className="flex-1 w-full h-full relative z-[10]">
         <MapContainer 
           center={mapCenter} 
           zoom={mapZoom} 
           style={{ height: "100%", width: "100%" }}
           zoomControl={false}
         >
-          {/* Dark Mode Tiles */}
+          {/* TileLayer with custom class for dark mode filters */}
           <TileLayer
+            className="map-tiles-dark"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           
           <ChangeView center={mapCenter} zoom={mapZoom} />
 
-          {/* Unit Markers (Police Stations) */}
+          {/* Support Units (Police Stations) */}
           {units.map((unit) => (
             <Marker
               key={unit.id}
@@ -247,10 +239,9 @@ export function TacticalMap() {
             </Marker>
           ))}
 
-          {/* Emergency Markers */}
+          {/* Active Emergencies */}
           {emergencies.map((emer) => {
-            // Priority takes precedence for color if it's critical
-            const markerColor = emer.priority === "critical" 
+            const markerColor = (emer.priority?.toLowerCase() === "critical")
               ? priorityColors.critical 
               : (emotionColors[emer.emotion as keyof typeof emotionColors] || priorityColors[emer.priority as keyof typeof priorityColors] || "#FF9933");
 
@@ -277,54 +268,43 @@ export function TacticalMap() {
         </MapContainer>
       </div>
 
-      {/* Legend */}
+      {/* Legends Overlay */}
       <div className="absolute bottom-5 left-5 right-5 z-[500] pointer-events-none flex justify-between items-end">
-        {/* Left Legend: Emotions/Priority */}
         <motion.div 
           initial={{ x: -20, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
-          className="bg-[#030810]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-2xl border-t-white/10 pointer-events-auto"
+          className="bg-[#030810]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-2xl pointer-events-auto"
         >
           <p className="text-[10px] font-black text-[#7B8FA8] mb-3 tracking-[0.2em] uppercase opacity-60">Threat Levels</p>
-          <div className="flex gap-5">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-[#FF0000] shadow-[0_0_10px_#FF0000]" />
-              <span className="text-[10px] text-white font-bold uppercase">Critical</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-[#FF6600] shadow-[0_0_10px_#FF6600]" />
-              <span className="text-[10px] text-white font-bold uppercase">High</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-[#FFCC00] shadow-[0_0_10px_#FFCC00]" />
-              <span className="text-[10px] text-white font-bold uppercase">Medium</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-[#00FF88] shadow-[0_0_10px_#00FF88]" />
-              <span className="text-[10px] text-white font-bold uppercase">Low</span>
-            </div>
+          <div className="flex gap-4">
+            {Object.entries(priorityColors).map(([level, color]) => (
+              <div key={level} className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: color, boxShadow: `0 0 10px ${color}` }} />
+                <span className="text-[9px] text-white font-black uppercase">{level}</span>
+              </div>
+            ))}
           </div>
         </motion.div>
 
-        {/* Right Legend: Units */}
         <motion.div 
           initial={{ x: 20, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
-          className="bg-[#030810]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-2xl border-t-white/10 pointer-events-auto"
+          className="bg-[#030810]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-2xl pointer-events-auto"
         >
           <p className="text-[10px] font-black text-[#7B8FA8] mb-3 tracking-[0.2em] uppercase opacity-60">Field Assets</p>
-          <div className="flex gap-5">
-            <div className="flex items-center gap-2">
-              <div className="w-5 h-5 rounded-lg bg-[#2979FF] flex items-center justify-center shadow-[0_0_15px_#2979FF]">
-                <Shield size={10} className="text-white" />
-              </div>
-              <span className="text-[10px] text-white font-bold uppercase">Police Station</span>
+          <div className="flex items-center gap-2">
+            <div className="w-5 h-5 rounded-lg bg-[#2979FF] flex items-center justify-center shadow-[0_0_15px_#2979FF]">
+              <Shield size={10} className="text-white" />
             </div>
+            <span className="text-[10px] text-white font-bold uppercase">Police Unit</span>
           </div>
         </motion.div>
       </div>
 
       <style>{`
+        .map-tiles-dark {
+          filter: grayscale(0.85) contrast(1.2) invert(0.92) hue-rotate(185deg) brightness(0.8);
+        }
         .pulse-wrapper {
           position: relative;
           display: flex;

@@ -118,6 +118,7 @@ async def get_heatmap_data(db: AsyncSession = Depends(get_db)):
     """Returns data for map view from the last 24 hours."""
     try:
         past_24h = datetime.utcnow() - timedelta(hours=24)
+        # Sort by newest first
         stmt = select(Case).where(
             and_(
                 Case.created_at >= past_24h,
@@ -125,6 +126,7 @@ async def get_heatmap_data(db: AsyncSession = Depends(get_db)):
                 Case.location_lng.is_not(None)
             )
         ).order_by(Case.created_at.desc())
+        
         result = await db.execute(stmt)
         cases = result.scalars().all()
 
@@ -133,12 +135,11 @@ async def get_heatmap_data(db: AsyncSession = Depends(get_db)):
             items.append(HeatmapItem(
                 lat=case.location_lat,
                 lng=case.location_lng,
-                priority=case.priority,
+                priority=(case.priority or "medium").lower(),
                 case_id=case.id,
                 intent=case.intent_type,
-                emotion=case.emotion_level or "unknown"
+                emotion=(case.emotion_level or "unknown").lower()
             ))
-        
         return items
     except Exception as e:
         print(f"⚠️ Heatmap Error: {e}")
@@ -146,29 +147,52 @@ async def get_heatmap_data(db: AsyncSession = Depends(get_db)):
 
 @router.get("/units", response_model=List[UnitItem])
 async def get_units(db: AsyncSession = Depends(get_db)):
-    """Returns dispatch units/police stations."""
+    """Returns dispatch units/police stations. Dynamically adds stations from active cases."""
     try:
-        stmt = select(DispatchUnit)
-        result = await db.execute(stmt)
+        # 1. Get static units from DB
+        result = await db.execute(select(DispatchUnit))
         units = result.scalars().all()
+        
+        final_units = []
+        
+        # 2. Add fallback/static units
         if not units:
-            # Fallback for Demo if DB is unseeded
-            return [
-                UnitItem(id=999, name="Navi Mumbai HQ", type="police", lat=19.0330, lng=73.0297, is_available=True),
-                UnitItem(id=998, name="Hebbal Response Team", type="police", lat=13.0354, lng=77.5988, is_available=True),
-                UnitItem(id=997, name="Central Sector Station", type="police", lat=12.9716, lng=77.5946, is_available=False),
-            ]
+            final_units.extend([
+                UnitItem(id="999", name="Navi Mumbai HQ", type="police", lat=19.0330, lng=73.0297, is_available=True),
+                UnitItem(id="998", name="Hebbal Response Team", type="police", lat=13.0354, lng=77.5988, is_available=True),
+            ])
+        else:
+            final_units.extend([
+                UnitItem(
+                    id=str(u.id), name=u.unit_name, type=u.unit_type,
+                    lat=u.current_lat, lng=u.current_lng, is_available=u.is_available
+                ) for u in units if u.current_lat and u.current_lng
+            ])
 
-        return [
-            UnitItem(
-                id=u.id,
-                name=u.unit_name,
-                type=u.unit_type,
-                lat=u.current_lat,
-                lng=u.current_lng,
-                is_available=u.is_available
-            ) for u in units if u.current_lat and u.current_lng
-        ]
+        # 3. DISCOVER nearby stations from recent cases (last 1 hour)
+        past_1h = datetime.utcnow() - timedelta(hours=1)
+        stmt = select(Case).where(and_(Case.created_at >= past_1h, Case.notes.is_not(None)))
+        result = await db.execute(stmt)
+        active_cases = result.scalars().all()
+        
+        for case in active_cases:
+            try:
+                station_info = json.loads(case.notes)
+                if station_info and "lat" in station_info:
+                    # Check if we already added a station with this name
+                    if not any(u.name == station_info["name"] for u in final_units):
+                        final_units.append(UnitItem(
+                            id=str(abs(hash(case.id)) % 10000),
+                            name=station_info["name"],
+                            type="police",
+                            lat=station_info["lat"],
+                            lng=station_info["lng"],
+                            is_available=True
+                        ))
+            except:
+                continue
+
+        return final_units
     except Exception as e:
         print(f"⚠️ Units Error: {e}")
         return []

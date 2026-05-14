@@ -26,7 +26,8 @@ CASE_BANK = [
         "priority": "critical",
         "status": "new",
         "raw_transcript": "कोई मेरा पीछा कर रहा है स्टेशन से... मुझे बहुत डर लग रहा है, जल्दी आओ! वो काली जैकेट पहने है और मेरे पीछे आ रहा है!",
-        "ai_summary": "Caller reports being followed from Majestic Metro Station by a man in black jacket. High panic state. Immediate response required."
+        "ai_summary": "Caller reports being followed from Majestic Metro Station by a man in black jacket. High panic state. Immediate response required.",
+        "nearby_station": {"name": "Majestic Transit Police", "lat": 12.9750, "lng": 77.5720}
     },
     {
         "caller_phone": "+91 94480 55667",
@@ -43,7 +44,8 @@ CASE_BANK = [
         "priority": "critical",
         "status": "new",
         "raw_transcript": "ಯಾರೋ ನನ್ನನ್ನು ಮೆಟ್ರೋ ಇಂದ ಹಿಂಬಾಲಿಸುತ್ತಿದ್ದಾರೆ... ನನಗೆ ತುಂಬಾ ಭಯವಾಗುತ್ತಿದೆ, ದಯವಿಟ್ಟು ಬೇಗ ಬನ್ನಿ! ಅವನು ಕಪ್ಪು ಜಾಕೆಟ್ ಧರಿಸಿದ್ದಾನೆ!",
-        "ai_summary": "Kannada caller reports stalking from Indiranagar. High panic state. Suspect in black jacket following. Urgent response needed."
+        "ai_summary": "Kannada caller reports stalking from Indiranagar. High panic state. Suspect in black jacket following. Urgent response needed.",
+        "nearby_station": {"name": "Indiranagar Sector 2", "lat": 12.9700, "lng": 77.6450}
     },
     {
         "caller_phone": "+91 99300 22002",
@@ -94,7 +96,8 @@ CASE_BANK = [
         "priority": "critical",
         "status": "new",
         "raw_transcript": "एक आदमी गाड़ी में खींचने की कोशिश कर रहा है! मैं इलेक्ट्रॉनिक सिटी में हूँ... विप्रो गेट के पास! कोई नहीं है यहाँ... जल्दी आओ प्लीज़!",
-        "ai_summary": "Attempted abduction at Electronic City. Suspect attempted to force victim into a vehicle. Caller alone at location. Critical priority."
+        "ai_summary": "Attempted abduction at Electronic City. Suspect attempted to force victim into a vehicle. Caller alone at location. Critical priority.",
+        "nearby_station": {"name": "E-City Tactical Unit", "lat": 12.8550, "lng": 77.6650}
     },
     {
         "caller_phone": "+91 70000 55005",
@@ -111,7 +114,8 @@ CASE_BANK = [
         "priority": "critical",
         "status": "new",
         "raw_transcript": "एक माणूस बाटली घेऊन माझ्याकडे येतोय... म्हणतोय की ॲसिड टाकेल... MG Road वर आहे मी... देवा!",
-        "ai_summary": "Acid attack threat at MG Road. Suspect approaching victim with a bottle. Extreme danger. Immediate armed response required."
+        "ai_summary": "Acid attack threat at MG Road. Suspect approaching victim with a bottle. Extreme danger. Immediate armed response required.",
+        "nearby_station": {"name": "Cubbon Park Central", "lat": 12.9730, "lng": 77.6100}
     },
     # ── HIGH PRIORITY CASES ──
     {
@@ -129,7 +133,8 @@ CASE_BANK = [
         "priority": "high",
         "status": "new",
         "raw_transcript": "यहाँ कुछ लड़के बहुत परेशान कर रहे हैं... अश्लील बातें बोल रहे हैं... मैं अकेली हूँ पार्क में शाम को...",
-        "ai_summary": "Group harassment in HSR Layout. Multiple suspects making obscene remarks at lone victim. Evening time, high risk. Quick response needed."
+        "ai_summary": "Group harassment in HSR Layout. Multiple suspects making obscene remarks at lone victim. Evening time, high risk. Quick response needed.",
+        "nearby_station": {"name": "HSR Sector 2 Command", "lat": 12.9150, "lng": 77.6400}
     },
     {
         "caller_phone": "+91 94490 88990",
@@ -146,7 +151,8 @@ CASE_BANK = [
         "priority": "high",
         "status": "new",
         "raw_transcript": "ನನ್ನ ಪತಿ ನನ್ನನ್ನು ಮನೆಯಿಂದ ಹೊರಹಾಕಿದ್ದಾರೆ ಮತ್ತು ಹೊಡೆದಿದ್ದಾರೆ... ದಯವಿಟ್ಟು ಸಹಾಯ ಮಾಡಿ... ನಾನು ಮಲ್ಲೇಶ್ವರಂನಲ್ಲಿ ಇದ್ದೇನೆ.",
-        "ai_summary": "Domestic violence reported in Malleshwaram. Husband assaulted victim and forced her out of the house. Victim in distress on the street. High priority intervention."
+        "ai_summary": "Domestic violence reported in Malleshwaram. Husband assaulted victim and forced her out of the house. Victim in distress on the street. High priority intervention.",
+        "nearby_station": {"name": "Malleshwaram Division HQ", "lat": 12.9980, "lng": 77.5720}
     },
     {
         "caller_phone": "+91 88800 77007",
@@ -180,7 +186,8 @@ CASE_BANK = [
         "priority": "high",
         "status": "new",
         "raw_transcript": "जयनगरमध्ये एक गाडीतून चार मुले माझ्या मागे येत आहेत... सीटी वाजवत आहेत आणि त्रास देत आहेत... मी चालत घरी चालले आहे...",
-        "ai_summary": "Eve teasing by group in a vehicle following victim on foot in Jayanagar. Four suspects. Victim walking home alone. High risk."
+        "ai_summary": "Eve teasing by group in a vehicle following victim on foot in Jayanagar. Four suspects. Victim walking home alone. High risk.",
+        "nearby_station": {"name": "Jayanagar 4th Block Station", "lat": 12.9300, "lng": 77.5800}
     },
     {
         "caller_phone": "+91 66600 99009",
@@ -197,7 +204,8 @@ CASE_BANK = [
         "priority": "high",
         "status": "new",
         "raw_transcript": "मेरे ससुराल वाले मुझे दहेज के लिए परेशान कर रहे हैं... आज बहुत मारा... मेरे पति भी साथ में हैं उनके... मुझे निकलना है यहाँ से...",
-        "ai_summary": "Dowry harassment and physical assault in BTM Layout. Husband and in-laws both involved. Victim wants to escape. High priority."
+        "ai_summary": "Dowry harassment and physical assault in BTM Layout. Husband and in-laws both involved. Victim wants to escape. High priority.",
+        "nearby_station": {"name": "BTM Lake Patrol Base", "lat": 12.9150, "lng": 77.6150}
     },
     {
         "caller_phone": "+91 55500 10010",
@@ -403,7 +411,8 @@ CASE_BANK = [
         "priority": "critical",
         "status": "new",
         "raw_transcript": "I came for morning walk at Lalbagh alone and a man attacked me. I hit him with my water bottle and ran. I'm on the main road now. I'm bleeding. My friend is coming but I'm scared he's following me.",
-        "ai_summary": "Physical assault at Lalbagh garden. Victim injured and bleeding. Suspect may be pursuing. Ambulance and patrol required immediately."
+        "ai_summary": "Physical assault at Lalbagh garden. Victim injured and bleeding. Suspect may be pursuing. Ambulance and patrol required immediately.",
+        "nearby_station": {"name": "Lalbagh West Gate Unit", "lat": 12.9520, "lng": 77.5830}
     },
     {
         "caller_phone": "+91 88800 15015",
