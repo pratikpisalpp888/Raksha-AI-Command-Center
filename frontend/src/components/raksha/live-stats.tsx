@@ -34,11 +34,19 @@ export function LiveStats() {
       
       // Update call history chart
       setCallHistory(prev => {
-        const newPoint = { time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'}), calls: data.active_calls_count }
-        const newHistory = [...prev, newPoint].slice(-10)
+        const newPoint = { 
+            time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'}), 
+            calls: data.active_calls_count 
+        }
+        const newHistory = [...prev, newPoint].filter(p => p.time !== '0').slice(-10)
+        
         if (newHistory.length < 10) {
-          // Fill with some dummy initial data if empty
-          return Array(10 - newHistory.length).fill(0).map((_, i) => ({ time: `${i}`, calls: 0 })).concat(newHistory)
+          // Fill with steady data instead of 0 to avoid sharp "falls" or "rises"
+          const fill = Array(10 - newHistory.length).fill(0).map((_, i) => ({ 
+            time: `init-${i}`, 
+            calls: data.active_calls_count 
+          }))
+          return fill.concat(newHistory)
         }
         return newHistory
       })
@@ -87,14 +95,13 @@ export function LiveStats() {
   ] : []
 
   return (
-    <motion.div
-      className="grid grid-cols-3 gap-5 px-6 mb-5"
-      initial={{ y: 30, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ delay: 0.55, duration: 0.5 }}
-    >
+    <div className="grid grid-cols-3 gap-5 px-6 mb-5">
+
       {/* Live Call Volume Chart */}
-      <div className="glass-card p-4 flex flex-col">
+      <motion.div 
+        whileHover={{ scale: 1.01, translateY: -2 }}
+        className="glass-card p-4 flex flex-col cursor-default hover:border-[rgba(255,153,51,0.3)] transition-all duration-300 shadow-lg hover:shadow-[0_0_25px_rgba(255,153,51,0.1)]"
+      >
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <div className="p-2 rounded-lg bg-[rgba(255,107,0,0.15)]">
@@ -118,20 +125,24 @@ export function LiveStats() {
           </div>
         </div>
         
-        <div className="flex-1 h-[100px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={callHistory} margin={{ top: 5, right: 10, left: 10, bottom: 5 }}>
-              <Line 
-                type="monotone" 
-                dataKey="calls" 
-                stroke="#FF9933" 
-                strokeWidth={2}
-                dot={false}
-                isAnimationActive={false}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
+        <div className="h-[100px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={callHistory}>
+                <Line 
+                  type="monotone" 
+                  dataKey="calls" 
+                  stroke="#FF9933" 
+                  strokeWidth={3} 
+                  dot={false} 
+                  isAnimationActive={false}
+                />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: '#030810', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
+                  itemStyle={{ color: '#FF9933', fontSize: '10px' }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
 
         <div className="flex justify-between mt-3 pt-3 border-t border-[rgba(255,107,0,0.1)]">
           <div className="flex items-center gap-1.5">
@@ -143,10 +154,13 @@ export function LiveStats() {
             Live Feed
           </span>
         </div>
-      </div>
+      </motion.div>
 
       {/* Emotion Distribution */}
-      <div className="glass-card p-4 flex flex-col">
+      <motion.div 
+        whileHover={{ scale: 1.01, translateY: -2 }}
+        className="glass-card p-4 flex flex-col cursor-default hover:border-[rgba(41,121,255,0.3)] transition-all duration-300 shadow-lg hover:shadow-[0_0_25px_rgba(41,121,255,0.1)]"
+      >
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <div className="p-2 rounded-lg bg-[rgba(41,121,255,0.15)]">
@@ -159,23 +173,20 @@ export function LiveStats() {
           </div>
         </div>
         
-        <div className="flex-1 h-[100px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={emotionData} layout="vertical" margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-              <XAxis type="number" hide />
-              <YAxis dataKey="name" type="category" hide />
-              <Tooltip 
-                contentStyle={{ background: '#030810', border: '1px solid #2979FF', fontSize: '10px' }}
-                itemStyle={{ color: '#F5F0FF' }}
-              />
-              <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={12}>
-                {emotionData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+        <div className="h-[100px] w-full mt-auto">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={emotionData} layout="vertical" barSize={20}>
+                <XAxis type="number" hide />
+                <YAxis dataKey="name" type="category" hide />
+                <Tooltip cursor={{fill: 'transparent'}} />
+                <Bar dataKey="value" radius={[0, 4, 4, 0]} isAnimationActive={false}>
+                  {emotionData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
 
         <div className="flex justify-between mt-3 pt-3 border-t border-[rgba(255,107,0,0.1)]">
           {emotionData.map((d) => (
@@ -185,10 +196,13 @@ export function LiveStats() {
             </span>
           ))}
         </div>
-      </div>
+      </motion.div>
 
       {/* Live Activity Feed */}
-      <div className="glass-card p-4 flex flex-col">
+      <motion.div 
+        whileHover={{ scale: 1.01, translateY: -2 }}
+        className="glass-card p-4 flex flex-col cursor-default hover:border-[rgba(0,230,118,0.3)] transition-all duration-300 shadow-lg hover:shadow-[0_0_25px_rgba(0,230,118,0.1)]"
+      >
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <div className="p-2 rounded-lg bg-[rgba(0,230,118,0.15)]">
@@ -223,7 +237,7 @@ export function LiveStats() {
             ))}
           </AnimatePresence>
         </div>
-      </div>
+      </motion.div>
     </motion.div>
   )
 }

@@ -124,7 +124,7 @@ async def get_heatmap_data(db: AsyncSession = Depends(get_db)):
                 Case.location_lat.is_not(None),
                 Case.location_lng.is_not(None)
             )
-        )
+        ).order_by(Case.created_at.desc())
         result = await db.execute(stmt)
         cases = result.scalars().all()
 
@@ -151,7 +151,14 @@ async def get_units(db: AsyncSession = Depends(get_db)):
         stmt = select(DispatchUnit)
         result = await db.execute(stmt)
         units = result.scalars().all()
-        
+        if not units:
+            # Fallback for Demo if DB is unseeded
+            return [
+                UnitItem(id=999, name="Navi Mumbai HQ", type="police", lat=19.0330, lng=73.0297, is_available=True),
+                UnitItem(id=998, name="Hebbal Response Team", type="police", lat=13.0354, lng=77.5988, is_available=True),
+                UnitItem(id=997, name="Central Sector Station", type="police", lat=12.9716, lng=77.5946, is_available=False),
+            ]
+
         return [
             UnitItem(
                 id=u.id,

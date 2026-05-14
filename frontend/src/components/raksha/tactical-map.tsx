@@ -23,11 +23,18 @@ const DEFAULT_CENTER: [number, number] = [19.0330, 73.0297]
 const DEFAULT_ZOOM = 12
 
 const emotionColors = {
-  panic: "#FF2D55",
-  distressed: "#FF6B2B",
-  concerned: "#FFD60A",
-  calm: "#00E676",
+  panic: "#FF0000",      // Vibrant Red
+  distressed: "#FF6600",   // Strong Orange
+  concerned: "#FFCC00",   // Amber
+  calm: "#00FF88",        // Neon Green
   unknown: "#7B8FA8",
+}
+
+const priorityColors = {
+  critical: "#FF0000",
+  high: "#FF6600",
+  medium: "#FFCC00",
+  low: "#00FF88",
 }
 
 const unitColors = {
@@ -41,18 +48,13 @@ const createPulseIcon = (color: string) => {
   return L.divIcon({
     className: "custom-pulse-icon",
     html: `
-      <div style="
-        width: 14px; 
-        height: 14px; 
-        background-color: ${color}; 
-        border-radius: 50%; 
-        border: 2px solid white;
-        box-shadow: 0 0 10px ${color};
-        animation: map-pulse 1.5s infinite;
-      "></div>
+      <div class="pulse-wrapper">
+        <div class="pulse-dot" style="background-color: ${color}; box-shadow: 0 0 15px ${color};"></div>
+        <div class="pulse-ring" style="border-color: ${color};"></div>
+      </div>
     `,
-    iconSize: [14, 14],
-    iconAnchor: [7, 7],
+    iconSize: [20, 20],
+    iconAnchor: [10, 10],
   })
 }
 
@@ -108,12 +110,12 @@ export function TacticalMap() {
       setUnits(unitsData || [])
       setLastUpdated(new Date())
       
-      // If there's a new critical emergency, fly to it!
+      // Auto-focus on the latest case if it's new
       if (heatmap && heatmap.length > 0) {
         const latest = heatmap[0]
         if (latest.lat && latest.lng) {
             setMapCenter([latest.lat, latest.lng])
-            setMapZoom(14) // Tactical zoom in
+            setMapZoom(14) 
         }
       }
     } catch (err) {
@@ -122,6 +124,16 @@ export function TacticalMap() {
       setLoading(false)
     }
   }, [])
+
+  const handleRecenter = () => {
+    if (emergencies.length > 0 && emergencies[0].lat) {
+        setMapCenter([emergencies[0].lat, emergencies[0].lng])
+        setMapZoom(14)
+    } else {
+        setMapCenter(DEFAULT_CENTER)
+        setMapZoom(DEFAULT_ZOOM)
+    }
+  }
 
   useEffect(() => {
     fetchMarkers()
@@ -172,12 +184,20 @@ export function TacticalMap() {
                 <span className="bg-[#FF2D55]/10 text-[#FF2D55] text-[8px] font-black px-1.5 py-0.5 rounded border border-[#FF2D55]/20 animate-pulse">LIVE FEED</span>
               </div>
               <p className="text-[9px] text-[#7B8FA8] tracking-[0.4em] font-bold uppercase opacity-60 mt-0.5">
-                NAVI MUMBAI • CORE SECTOR 04
+                ACTIVE MONITORING • ALL SECTORS
               </p>
             </div>
           </motion.div>
 
           <div className="flex gap-2 pointer-events-auto">
+             <button 
+              onClick={handleRecenter}
+              title="Recenter on latest case"
+              className="p-3 rounded-xl bg-[#030810]/90 backdrop-blur-xl border border-white/10 text-[#7B8FA8] hover:text-[#00E676] hover:border-[#00E676]/30 transition-all shadow-lg active:scale-95 flex items-center gap-2"
+            >
+              <MapPin size={16} />
+              <span className="text-[10px] font-bold uppercase tracking-widest hidden sm:inline">Recenter</span>
+            </button>
              <button 
               onClick={fetchMarkers}
               className="p-3 rounded-xl bg-[#030810]/90 backdrop-blur-xl border border-white/10 text-[#7B8FA8] hover:text-[#FF9933] hover:border-[#FF9933]/30 transition-all shadow-lg active:scale-95"
@@ -228,44 +248,61 @@ export function TacticalMap() {
           ))}
 
           {/* Emergency Markers */}
-          {emergencies.map((emer) => (
-            <Marker
-              key={emer.case_id}
-              position={[emer.lat, emer.lng]}
-              icon={createPulseIcon(emotionColors[emer.emotion as keyof typeof emotionColors] || "#FF9933")}
-            >
-              <Popup>
-                <div className="p-2 min-w-[120px]">
-                  <p className="text-[10px] font-black text-[#FF6B00] mb-1 tracking-widest uppercase">SIGNAL DETECTED</p>
-                  <p className="text-sm font-bold text-white mb-1 uppercase tracking-tight">{emer.intent}</p>
-                  <div className="h-px w-full bg-white/10 my-2" />
-                  <p className="text-[9px] text-[#7B8FA8] font-bold uppercase tracking-widest flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: emotionColors[emer.emotion as keyof typeof emotionColors] }} />
-                    EMOTION: {emer.emotion}
-                  </p>
-                </div>
-              </Popup>
-            </Marker>
-          ))}
+          {emergencies.map((emer) => {
+            // Priority takes precedence for color if it's critical
+            const markerColor = emer.priority === "critical" 
+              ? priorityColors.critical 
+              : (emotionColors[emer.emotion as keyof typeof emotionColors] || priorityColors[emer.priority as keyof typeof priorityColors] || "#FF9933");
+
+            return (
+              <Marker
+                key={emer.case_id}
+                position={[emer.lat, emer.lng]}
+                icon={createPulseIcon(markerColor)}
+              >
+                <Popup>
+                  <div className="p-2 min-w-[120px]">
+                    <p className="text-[10px] font-black text-[#FF6B00] mb-1 tracking-widest uppercase">SIGNAL DETECTED</p>
+                    <p className="text-sm font-bold text-white mb-1 uppercase tracking-tight">{emer.intent}</p>
+                    <div className="h-px w-full bg-white/10 my-2" />
+                    <p className="text-[9px] text-[#7B8FA8] font-bold uppercase tracking-widest flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: markerColor }} />
+                      STATUS: {emer.priority?.toUpperCase()} / {emer.emotion?.toUpperCase()}
+                    </p>
+                  </div>
+                </Popup>
+              </Marker>
+            );
+          })}
         </MapContainer>
       </div>
 
       {/* Legend */}
       <div className="absolute bottom-5 left-5 right-5 z-[500] pointer-events-none flex justify-between items-end">
-        {/* Left Legend: Emotions */}
+        {/* Left Legend: Emotions/Priority */}
         <motion.div 
           initial={{ x: -20, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
-          className="bg-[#030810]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-3 shadow-2xl border-t-white/10 pointer-events-auto"
+          className="bg-[#030810]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-2xl border-t-white/10 pointer-events-auto"
         >
-          <p className="text-[8px] font-black text-[#7B8FA8] mb-2 tracking-[0.2em] uppercase opacity-60">Emergency Emotions</p>
-          <div className="flex gap-3">
-            {Object.entries(emotionColors).slice(0, 4).map(([level, color]) => (
-              <div key={level} className="flex items-center gap-1.5">
-                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: color }} />
-                <span className="text-[8px] text-white/70 font-bold uppercase">{level}</span>
-              </div>
-            ))}
+          <p className="text-[10px] font-black text-[#7B8FA8] mb-3 tracking-[0.2em] uppercase opacity-60">Threat Levels</p>
+          <div className="flex gap-5">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-[#FF0000] shadow-[0_0_10px_#FF0000]" />
+              <span className="text-[10px] text-white font-bold uppercase">Critical</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-[#FF6600] shadow-[0_0_10px_#FF6600]" />
+              <span className="text-[10px] text-white font-bold uppercase">High</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-[#FFCC00] shadow-[0_0_10px_#FFCC00]" />
+              <span className="text-[10px] text-white font-bold uppercase">Medium</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-[#00FF88] shadow-[0_0_10px_#00FF88]" />
+              <span className="text-[10px] text-white font-bold uppercase">Low</span>
+            </div>
           </div>
         </motion.div>
 
@@ -273,33 +310,59 @@ export function TacticalMap() {
         <motion.div 
           initial={{ x: 20, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
-          className="bg-[#030810]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-3 shadow-2xl border-t-white/10 pointer-events-auto"
+          className="bg-[#030810]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-2xl border-t-white/10 pointer-events-auto"
         >
-          <p className="text-[8px] font-black text-[#7B8FA8] mb-2 tracking-[0.2em] uppercase opacity-60">Support Units</p>
-          <div className="flex gap-4">
-            <div className="flex items-center gap-1.5">
-              <div className="w-2.5 h-2.5 rounded bg-[#2979FF] flex items-center justify-center">
-                <Shield size={6} className="text-white" />
+          <p className="text-[10px] font-black text-[#7B8FA8] mb-3 tracking-[0.2em] uppercase opacity-60">Field Assets</p>
+          <div className="flex gap-5">
+            <div className="flex items-center gap-2">
+              <div className="w-5 h-5 rounded-lg bg-[#2979FF] flex items-center justify-center shadow-[0_0_15px_#2979FF]">
+                <Shield size={10} className="text-white" />
               </div>
-              <span className="text-[8px] text-white font-bold uppercase">Police Station</span>
+              <span className="text-[10px] text-white font-bold uppercase">Police Station</span>
             </div>
           </div>
         </motion.div>
       </div>
 
       <style>{`
-        @keyframes map-pulse {
-          0% { box-shadow: 0 0 0 0px rgba(255, 255, 255, 0.7); }
-          70% { box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
-          100% { box-shadow: 0 0 0 0px rgba(255, 255, 255, 0); }
+        .pulse-wrapper {
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 20px;
+          height: 20px;
+        }
+        .pulse-dot {
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          border: 2px solid white;
+          z-index: 2;
+        }
+        .pulse-ring {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          border: 2px solid;
+          border-radius: 50%;
+          animation: map-ring-pulse 1.5s ease-out infinite;
+          opacity: 0;
+          z-index: 1;
+        }
+        @keyframes map-ring-pulse {
+          0% { transform: scale(0.5); opacity: 0.8; }
+          100% { transform: scale(2.5); opacity: 0; }
         }
         .leaflet-container {
           background: #030810 !important;
         }
         .leaflet-popup-content-wrapper {
-          background: #030810 !important;
+          background: rgba(3, 8, 16, 0.95) !important;
+          backdrop-filter: blur(10px);
           color: white !important;
           border: 1px solid rgba(255,107,0,0.3);
+          border-radius: 12px !important;
         }
         .leaflet-popup-tip {
           background: #030810 !important;
