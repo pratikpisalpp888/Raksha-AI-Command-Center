@@ -141,6 +141,17 @@ export function TacticalMap() {
     return () => window.removeEventListener('raksha-emergency', handleNewEmergency)
   }, [fetchMarkers])
 
+  // 🔄 Reset map markers on global reset event
+  useEffect(() => {
+    const handleReset = () => {
+      setEmergencies([])
+      setMapCenter(DEFAULT_CENTER)
+      setMapZoom(DEFAULT_ZOOM)
+    }
+    window.addEventListener('raksha-reset', handleReset)
+    return () => window.removeEventListener('raksha-reset', handleReset)
+  }, [])
+
   return (
     <motion.div
       className="cyber-card h-[520px] flex flex-col overflow-hidden relative border border-white/5 shadow-2xl group"

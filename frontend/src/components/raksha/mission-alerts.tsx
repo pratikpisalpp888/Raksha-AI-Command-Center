@@ -105,9 +105,16 @@ export function MissionAlerts() {
 
   useEffect(() => {
     fetchAlerts()
-    const interval = setInterval(fetchAlerts, 60000) // Polling fallback every 1m
+    const interval = setInterval(fetchAlerts, 60000)
     return () => clearInterval(interval)
   }, [fetchAlerts])
+
+  // 🔄 Clear all alerts on global reset event
+  useEffect(() => {
+    const handleReset = () => setAlerts([])
+    window.addEventListener('raksha-reset', handleReset)
+    return () => window.removeEventListener('raksha-reset', handleReset)
+  }, [])
 
   return (
     <motion.div

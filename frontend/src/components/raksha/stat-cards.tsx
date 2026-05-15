@@ -44,6 +44,15 @@ export function StatCards() {
     return () => { clearInterval(interval); clearTimeout(timer) }
   }, [fetchStats])
 
+  // 🔄 Reset all stat counters on global reset event
+  useEffect(() => {
+    const handleReset = () => {
+      setStats({ calls_last_24h: 0, active_calls_count: 0, avg_response_time: 0, calls_last_7d: 0 })
+    }
+    window.addEventListener('raksha-reset', handleReset)
+    return () => window.removeEventListener('raksha-reset', handleReset)
+  }, [])
+
   const resolvedCount = Math.max(0, stats.calls_last_24h - stats.active_calls_count)
   const resolutionRate = stats.calls_last_24h > 0
     ? Math.round((resolvedCount / stats.calls_last_24h) * 100)

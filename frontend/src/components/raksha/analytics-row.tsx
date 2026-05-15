@@ -41,6 +41,13 @@ export function AnalyticsRow() {
     return () => clearInterval(interval)
   }, [fetchAnalytics])
 
+  // 🔄 Reset all KPI charts on global reset event
+  useEffect(() => {
+    const handleReset = () => setStats(null)
+    window.addEventListener('raksha-reset', handleReset)
+    return () => window.removeEventListener('raksha-reset', handleReset)
+  }, [])
+
   // Map real data to charts
   const emotionData = stats ? [
     { emotion: "Panic", value: Math.round((stats.emotion_distribution.panic / (stats.calls_last_24h || 1)) * 100), color: "#FF2D55" },

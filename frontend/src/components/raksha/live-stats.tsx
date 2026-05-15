@@ -30,6 +30,20 @@ export function LiveStats() {
     return () => clearInterval(interval)
   }, [fetchStats])
 
+  // 🔄 Reset transcript and stats on global reset event
+  useEffect(() => {
+    const handleReset = () => {
+      setCurrentTranscript("Awaiting incoming signal...")
+      setCurrentTranslation("")
+      setDisplayedText("Awaiting incoming signal...")
+      setDisplayedTranslation("")
+      setIsTyping(false)
+      setStats(null)
+    }
+    window.addEventListener('raksha-reset', handleReset)
+    return () => window.removeEventListener('raksha-reset', handleReset)
+  }, [])
+
   // Typewriter Engine
   useEffect(() => {
     if (!isTyping) return;
