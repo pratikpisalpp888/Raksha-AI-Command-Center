@@ -2,84 +2,39 @@
 
 import { motion, AnimatePresence } from "framer-motion"
 import { LineChart, Line, ResponsiveContainer, BarChart, Bar, Cell, XAxis, YAxis, Tooltip } from "recharts"
-import { Phone, Users, Clock, CheckCircle, AlertCircle, TrendingUp, Headphones, Shield, Activity } from "lucide-react"
+import { Phone, Users, Clock, CheckCircle, AlertCircle, TrendingUp, Headphones, Shield, Activity, Mic } from "lucide-react"
 import { useState, useEffect, useCallback } from "react"
 import { getLiveStats } from "../../services/api"
 import { useRakshaWebSocket } from "../../hooks/useWebSocket"
 
-interface ActivityItem {
-  id: string
-  type: string
-  message: string
-  time: string
-  severity: "critical" | "warning" | "success" | "info"
-}
-
-const severityStyles = {
-  critical: { bg: "bg-[rgba(255,45,85,0.15)]", text: "text-[#FF2D55]", dot: "bg-[#FF2D55]" },
-  warning: { bg: "bg-[rgba(255,214,10,0.15)]", text: "text-[#FFD60A]", dot: "bg-[#FFD60A]" },
-  success: { bg: "bg-[rgba(0,230,118,0.15)]", text: "text-[#00E676]", dot: "bg-[#00E676]" },
-  info: { bg: "bg-[rgba(41,121,255,0.15)]", text: "text-[#2979FF]", dot: "bg-[#2979FF]" },
-}
-
 export function LiveStats() {
   const [stats, setStats] = useState<any>(null)
-  const [activities, setActivities] = useState<ActivityItem[]>([])
   const [callHistory, setCallHistory] = useState<{time: string, calls: number}[]>([])
+  const [currentTranscript, setCurrentTranscript] = useState("Awaiting incoming signal...")
+  const [isTyping, setIsTyping] = useState(false)
 
   const fetchStats = useCallback(async () => {
     try {
       const data = await getLiveStats()
       setStats(data)
-      
-      // Update call history chart
-      setCallHistory(prev => {
-        const newPoint = { 
-            time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'}), 
-            calls: data.active_calls_count 
-        }
-        const newHistory = [...prev, newPoint].filter(p => p.time !== '0').slice(-10)
-        
-        if (newHistory.length < 10) {
-          // Fill with steady data instead of 0 to avoid sharp "falls" or "rises"
-          const fill = Array(10 - newHistory.length).fill(0).map((_, i) => ({ 
-            time: `init-${i}`, 
-            calls: data.active_calls_count 
-          }))
-          return fill.concat(newHistory)
-        }
-        return newHistory
-      })
     } catch (err) {
       console.warn('[LiveStats] Failed to fetch live stats')
     }
   }, [])
 
-  // Real-time updates via WebSocket
-  useRakshaWebSocket({
-    onNewCase: (c) => {
-      const newActivity: ActivityItem = {
-        id: Math.random().toString(),
-        type: 'call',
-        message: `New ${c.priority} call: ${c.id}`,
-        time: 'Just now',
-        severity: c.priority === 'critical' ? 'critical' : c.priority === 'high' ? 'warning' : 'info'
+  // Listen for transcript events
+  useEffect(() => {
+    const handleTranscript = (e: any) => {
+      const text = e.detail?.transcript
+      if (text) {
+        setIsTyping(true)
+        setCurrentTranscript(text)
+        setTimeout(() => setIsTyping(false), 3000)
       }
-      setActivities(prev => [newActivity, ...prev].slice(0, 5))
-      fetchStats()
-    },
-    onStatusUpdate: (data) => {
-      const newActivity: ActivityItem = {
-        id: Math.random().toString(),
-        type: 'status',
-        message: `Case ${data.case_id} marked as ${data.status}`,
-        time: 'Just now',
-        severity: data.status === 'resolved' ? 'success' : 'info'
-      }
-      setActivities(prev => [newActivity, ...prev].slice(0, 5))
-      fetchStats()
     }
-  })
+    window.addEventListener('raksha-emergency', handleTranscript)
+    return () => window.removeEventListener('raksha-emergency', handleTranscript)
+  }, [])
 
   useEffect(() => {
     fetchStats()
@@ -97,7 +52,7 @@ export function LiveStats() {
   return (
     <div className="grid grid-cols-3 gap-5 px-6 mb-5">
 
-      {/* Impact Analytics — Replaces duplicate Live Call Volume */}
+      {/* 1. Impact Analytics */}
       <motion.div 
         whileHover={{ scale: 1.01, translateY: -2 }}
         className="glass-card p-4 flex flex-col cursor-default hover:border-[rgba(0,230,118,0.3)] transition-all duration-300 shadow-lg hover:shadow-[0_0_25px_rgba(0,230,118,0.1)]"
@@ -148,7 +103,7 @@ export function LiveStats() {
         </div>
       </motion.div>
 
-      {/* Emotion Distribution */}
+      {/* 2. Emotion Distribution */}
       <motion.div 
         whileHover={{ scale: 1.01, translateY: -2 }}
         className="glass-card p-4 flex flex-col cursor-default hover:border-[rgba(41,121,255,0.3)] transition-all duration-300 shadow-lg hover:shadow-[0_0_25px_rgba(41,121,255,0.1)]"
@@ -190,46 +145,58 @@ export function LiveStats() {
         </div>
       </motion.div>
 
-      {/* Live Activity Feed */}
+      {/* 3. Neural Transcript Card */}
       <motion.div 
         whileHover={{ scale: 1.01, translateY: -2 }}
-        className="glass-card p-4 flex flex-col cursor-default hover:border-[rgba(0,230,118,0.3)] transition-all duration-300 shadow-lg hover:shadow-[0_0_25px_rgba(0,230,118,0.1)]"
+        className="glass-card p-4 flex flex-col cursor-default hover:border-[rgba(255,153,51,0.3)] transition-all duration-300 shadow-lg hover:shadow-[0_0_25px_rgba(255,153,51,0.1)] relative overflow-hidden"
       >
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <div className="p-2 rounded-lg bg-[rgba(0,230,118,0.15)]">
-              <Headphones size={14} className="text-[#00E676]" />
+            <div className="p-2 rounded-lg bg-[rgba(255,107,0,0.15)] relative">
+              <Mic size={14} className={`text-[#FF9933] ${isTyping ? 'animate-pulse' : ''}`} />
+              {isTyping && <div className="absolute inset-0 bg-[#FF9933] blur-md opacity-20 animate-pulse" />}
             </div>
             <div>
-              <h4 className="text-xs font-semibold text-[#F5F0FF] uppercase tracking-wide">System Log</h4>
-              <p className="text-[10px] text-[#7B8FA8]">Real-time events</p>
+              <h4 className="text-xs font-semibold text-[#F5F0FF] uppercase tracking-wide">Neural Transcript</h4>
+              <p className="text-[10px] text-[#7B8FA8]">Live AI processing feed</p>
             </div>
+          </div>
+          <div className="flex items-center gap-2">
+             <div className={`w-1.5 h-1.5 rounded-full ${isTyping ? 'bg-[#00E676] animate-pulse' : 'bg-[#FF9933]'} shadow-[0_0_8px_currentColor]`} />
+             <span className="text-[9px] font-black text-[#7B8FA8] uppercase tracking-widest">{isTyping ? 'Live' : 'Standby'}</span>
           </div>
         </div>
         
-        <div className="flex-1 space-y-2 overflow-hidden">
-          <AnimatePresence initial={false}>
-            {activities.length === 0 && (
-              <div className="text-[10px] text-[#3D5068] text-center mt-4 italic">Waiting for events...</div>
-            )}
-            {activities.map((activity) => (
-              <motion.div
-                key={activity.id}
-                className={`flex items-center gap-2 p-2 rounded-lg ${severityStyles[activity.severity].bg}`}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, scale: 0.9 }}
+        <div className="flex-1 bg-black/30 rounded-[1.2rem] p-4 border border-white/5 relative group overflow-hidden">
+           <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.02),rgba(0,255,0,0.01),rgba(0,0,255,0.02))] bg-[length:100%_2px,3px_100%] z-10 opacity-30" />
+           <div className="relative z-20">
+              <motion.p 
+                key={currentTranscript}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-[14px] font-bold text-[#F5F0FF] leading-relaxed tracking-tight font-mono italic"
               >
-                <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${severityStyles[activity.severity].dot}`} />
-                <span className={`text-[9px] flex-1 truncate ${severityStyles[activity.severity].text}`}>
-                  {activity.message}
-                </span>
-                <span className="text-[8px] text-[#7B8FA8] flex-shrink-0">{activity.time}</span>
-              </motion.div>
-            ))}
-          </AnimatePresence>
+                <span className="text-[#FF9933] mr-2">>>></span>
+                {currentTranscript}
+                <span className="inline-block w-2 h-4 bg-[#FF9933] ml-1 animate-pulse" />
+              </motion.p>
+           </div>
+        </div>
+
+        <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+             <div className="flex gap-0.5">
+                {[1, 2, 3, 4, 5].map(i => (
+                  <div key={i} className={`w-1 h-3 rounded-full ${isTyping ? 'bg-[#00E676]' : 'bg-[#7B8FA8]/20'} transition-all duration-300`} 
+                       style={{ height: isTyping ? `${Math.random() * 12 + 4}px` : '4px' }} />
+                ))}
+             </div>
+             <span className="text-[9px] text-[#7B8FA8] font-black uppercase tracking-widest">Audio Frequency</span>
+          </div>
+          <span className="text-[9px] text-[#FF9933] font-black uppercase tracking-widest opacity-60">Raksha AI v4.0</span>
         </div>
       </motion.div>
+
     </div>
   )
 }
