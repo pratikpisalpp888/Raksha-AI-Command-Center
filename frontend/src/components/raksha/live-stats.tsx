@@ -41,23 +41,19 @@ export function LiveStats() {
       setDisplayedText("")
       setDisplayedTranslation("")
       
-      const nativeInterval = setInterval(() => {
-        setDisplayedText(currentTranscript.slice(0, i + 1))
-        i++
-        if (i >= currentTranscript.length) {
-          clearInterval(nativeInterval)
-          // Start translation after native finishes
-          const transInterval = setInterval(() => {
-            setDisplayedTranslation(currentTranslation.slice(0, j + 1))
-            j++
-            if (j >= currentTranslation.length) clearInterval(transInterval)
-          }, 20)
+      const interval = setInterval(() => {
+        if (i < currentTranscript.length) {
+          setDisplayedText(currentTranscript.slice(0, i + 1))
+          i++
+        } else if (j < currentTranslation.length) {
+          setDisplayedTranslation(currentTranslation.slice(0, j + 1))
+          j++
+        } else {
+          clearInterval(interval)
         }
-      }, 30)
+      }, 20) // Fast and smooth
       
-      return () => {
-        clearInterval(nativeInterval)
-      }
+      return () => clearInterval(interval)
     } else if (currentTranscript === "Awaiting incoming signal...") {
       setDisplayedText(currentTranscript)
       setDisplayedTranslation("")
@@ -73,7 +69,8 @@ export function LiveStats() {
         setIsTyping(true)
         setCurrentTranscript(text)
         setCurrentTranslation(trans || "")
-        setTimeout(() => setIsTyping(false), 5000)
+        // Reset typing indicator after 8 seconds (enough time to read)
+        setTimeout(() => setIsTyping(false), 8000)
       }
     }
     window.addEventListener('raksha-emergency', handleTranscript)
@@ -218,7 +215,6 @@ export function LiveStats() {
            <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.02),rgba(0,255,0,0.01),rgba(0,0,255,0.02))] bg-[length:100%_2px,3px_100%] z-10 opacity-30" />
            <div className="relative z-20 space-y-3">
               <motion.p 
-                key={displayedText}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 className="text-[15px] font-bold text-[#F5F0FF] leading-relaxed tracking-tight italic"
