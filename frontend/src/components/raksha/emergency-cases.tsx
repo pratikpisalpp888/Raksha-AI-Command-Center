@@ -81,10 +81,19 @@ export function EmergencyCases() {
 
   useEffect(() => {
     fetchCases()
-    // Reduced interval since we have WebSockets now
     const interval = setInterval(fetchCases, 60000) 
     return () => clearInterval(interval)
   }, [fetchCases])
+
+  // 🔄 Listen for global reset event — instantly wipes the cases list
+  useEffect(() => {
+    const handleReset = () => {
+      setCases([])
+      setLastUpdated(new Date())
+    }
+    window.addEventListener('raksha-reset', handleReset)
+    return () => window.removeEventListener('raksha-reset', handleReset)
+  }, [])
 
   const filtered = cases.filter(c =>
     !search || c.id.toLowerCase().includes(search.toLowerCase()) ||

@@ -209,8 +209,11 @@ export default function DemoControls() {
     try {
       await fetch(`${BASE_URL}/api/simulate/reset-session`, { method: 'POST' })
       setStatus('success')
-      setStatusMsg('🔄 All 20 cases refreshed!')
+      setStatusMsg('🔄 Dashboard cleared!')
       setLastCase(null)
+      setMode('live')
+      // 🔴 Fire global reset event — clears all frontend state instantly
+      window.dispatchEvent(new CustomEvent('raksha-reset'))
       setTimeout(() => { setStatus('ready'); setStatusMsg('') }, 3000)
     } catch {
       setStatusMsg('❌ Reset failed')
