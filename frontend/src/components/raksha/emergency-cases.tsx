@@ -71,7 +71,8 @@ export function EmergencyCases() {
       window.dispatchEvent(new CustomEvent('raksha-emergency', { 
         detail: { 
           priority: newCase.priority,
-          transcript: newCase.raw_transcript || newCase.intent_type || "Monitoring audio feed..."
+          transcript: newCase.raw_transcript || "Monitoring audio feed...",
+          translation: newCase.ai_summary || "Processing intelligence..."
         } 
       }))
     },

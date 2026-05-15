@@ -11,8 +11,11 @@ export function LiveStats() {
   const [stats, setStats] = useState<any>(null)
   const [callHistory, setCallHistory] = useState<{time: string, calls: number}[]>([])
   const [currentTranscript, setCurrentTranscript] = useState("Awaiting incoming signal...")
+  const [currentTranslation, setCurrentTranslation] = useState("")
   const [displayedText, setDisplayedText] = useState("Awaiting incoming signal...")
+  const [displayedTranslation, setDisplayedTranslation] = useState("")
   const [isTyping, setIsTyping] = useState(false)
+  const scrollRef = useRef<HTMLDivElement>(null)
 
   const fetchStats = useCallback(async () => {
     try {
@@ -23,32 +26,54 @@ export function LiveStats() {
     }
   }, [])
 
+  // Auto-scroll when text updates
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+    }
+  }, [displayedText, displayedTranslation])
+
   // Typewriter Effect logic
   useEffect(() => {
     if (isTyping) {
       let i = 0
+      let j = 0
       setDisplayedText("")
-      const interval = setInterval(() => {
+      setDisplayedTranslation("")
+      
+      const nativeInterval = setInterval(() => {
         setDisplayedText(currentTranscript.slice(0, i + 1))
         i++
         if (i >= currentTranscript.length) {
-          clearInterval(interval)
+          clearInterval(nativeInterval)
+          // Start translation after native finishes
+          const transInterval = setInterval(() => {
+            setDisplayedTranslation(currentTranslation.slice(0, j + 1))
+            j++
+            if (j >= currentTranslation.length) clearInterval(transInterval)
+          }, 20)
         }
-      }, 25) // Smooth, cinematic speed
-      return () => clearInterval(interval)
+      }, 30)
+      
+      return () => {
+        clearInterval(nativeInterval)
+      }
     } else if (currentTranscript === "Awaiting incoming signal...") {
       setDisplayedText(currentTranscript)
+      setDisplayedTranslation("")
     }
-  }, [currentTranscript, isTyping])
+  }, [currentTranscript, currentTranslation, isTyping])
 
   // Listen for transcript events
   useEffect(() => {
     const handleTranscript = (e: any) => {
       const text = e.detail?.transcript
+      const trans = e.detail?.translation
       if (text) {
         setIsTyping(true)
         setCurrentTranscript(text)
-        setTimeout(() => setIsTyping(false), 3000)
+        setCurrentTranslation(trans || "")
+        setTimeout(() => setIsTyping(false), 5000)
       }
     }
     window.addEventListener('raksha-emergency', handleTranscript)
@@ -186,9 +211,12 @@ export function LiveStats() {
           </div>
         </div>
         
-        <div className="flex-1 bg-black/30 rounded-[1.2rem] p-4 border border-white/5 relative group overflow-hidden">
+        <div 
+          ref={scrollRef}
+          className="flex-1 bg-black/30 rounded-[1.2rem] p-4 border border-white/5 relative group overflow-y-auto max-h-[140px] custom-scrollbar"
+        >
            <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.02),rgba(0,255,0,0.01),rgba(0,0,255,0.02))] bg-[length:100%_2px,3px_100%] z-10 opacity-30" />
-           <div className="relative z-20">
+           <div className="relative z-20 space-y-3">
               <motion.p 
                 key={displayedText}
                 initial={{ opacity: 0 }}
@@ -197,8 +225,20 @@ export function LiveStats() {
               >
                 <span className="text-[#FF9933] mr-2">&gt;&gt;&gt;</span>
                 {displayedText}
-                <span className="inline-block w-2 h-4 bg-[#FF9933] ml-1 animate-pulse" />
+                {isTyping && displayedTranslation === "" && <span className="inline-block w-2 h-4 bg-[#FF9933] ml-1 animate-pulse" />}
               </motion.p>
+
+              {displayedTranslation && (
+                <motion.p 
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="text-[12px] font-black text-[#00E676] leading-relaxed tracking-[0.05em] uppercase border-l-2 border-[#00E676]/30 pl-3 py-1 bg-[#00E676]/5 rounded-r-lg"
+                >
+                  <span className="text-[9px] opacity-60 mr-2 block mb-1">TRANSLATION:</span>
+                  {displayedTranslation}
+                  {isTyping && <span className="inline-block w-2 h-3 bg-[#00E676] ml-1 animate-pulse" />}
+                </motion.p>
+              )}
            </div>
         </div>
 
