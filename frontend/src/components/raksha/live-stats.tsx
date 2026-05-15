@@ -176,7 +176,7 @@ export function LiveStats() {
                 animate={{ opacity: 1 }}
                 className="text-[14px] font-bold text-[#F5F0FF] leading-relaxed tracking-tight font-mono italic"
               >
-                <span className="text-[#FF9933] mr-2">>>></span>
+                <span className="text-[#FF9933] mr-2">&gt;&gt;&gt;</span>
                 {currentTranscript}
                 <span className="inline-block w-2 h-4 bg-[#FF9933] ml-1 animate-pulse" />
               </motion.p>
