@@ -12,6 +12,15 @@ interface Particle {
 export function AnimatedBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const particlesRef = useRef<Particle[]>([])
+  const mouseRef = useRef({ x: 0, y: 0 })
+    
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      mouseRef.current = { x: e.clientX, y: e.clientY }
+    }
+    window.addEventListener("mousemove", handleMouseMove)
+    return () => window.removeEventListener("mousemove", handleMouseMove)
+  }, [])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -29,15 +38,15 @@ export function AnimatedBackground() {
 
     // Initialize particles
     const colors = [
-      "rgba(255,107,0,0.4)",  // Saffron
-      "rgba(41,121,255,0.4)"   // Blue
+      "rgba(255,107,0,0.3)",  // Saffron
+      "rgba(41,121,255,0.2)"   // Blue
     ]
     
-    particlesRef.current = Array.from({ length: 70 }, () => ({
+    particlesRef.current = Array.from({ length: 50 }, () => ({
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
-      vx: (Math.random() - 0.5) * 0.5,
-      vy: (Math.random() - 0.5) * 0.5,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: (Math.random() - 0.5) * 0.3,
       color: colors[Math.floor(Math.random() * colors.length)]
     }))
 
@@ -47,26 +56,23 @@ export function AnimatedBackground() {
       ctx.fillStyle = "#030810"
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-      // Draw circuit grid lines
-      ctx.strokeStyle = "rgba(255,107,0,0.04)"
-      ctx.lineWidth = 0.5
-      const gridSize = 40
-
+      // Draw Interactive Dot Grid
+      const gridSize = 50
       for (let x = 0; x < canvas.width; x += gridSize) {
-        ctx.beginPath()
-        ctx.moveTo(x, 0)
-        ctx.lineTo(x, canvas.height)
-        ctx.stroke()
+        for (let y = 0; y < canvas.height; y += gridSize) {
+          const dx = x - mouseRef.current.x
+          const dy = y - mouseRef.current.y
+          const dist = Math.sqrt(dx * dx + dy * dy)
+          const opacity = Math.max(0.02, 0.2 * (1 - dist / 300))
+          
+          ctx.beginPath()
+          ctx.arc(x, y, 1, 0, Math.PI * 2)
+          ctx.fillStyle = `rgba(255, 153, 51, ${opacity})`
+          ctx.fill()
+        }
       }
 
-      for (let y = 0; y < canvas.height; y += gridSize) {
-        ctx.beginPath()
-        ctx.moveTo(0, y)
-        ctx.lineTo(canvas.width, y)
-        ctx.stroke()
-      }
-
-      // Update and draw particles
+      // Update and draw neural particles
       const particles = particlesRef.current
       
       particles.forEach((p, i) => {
@@ -79,22 +85,22 @@ export function AnimatedBackground() {
 
         // Draw particle
         ctx.beginPath()
-        ctx.arc(p.x, p.y, 1.5, 0, Math.PI * 2)
+        ctx.arc(p.x, p.y, 1.2, 0, Math.PI * 2)
         ctx.fillStyle = p.color
         ctx.fill()
 
-        // Draw connections to nearby particles
+        // Neural connections
         for (let j = i + 1; j < particles.length; j++) {
           const p2 = particles[j]
           const dx = p.x - p2.x
           const dy = p.y - p2.y
           const dist = Math.sqrt(dx * dx + dy * dy)
 
-          if (dist < 100) {
+          if (dist < 150) {
             ctx.beginPath()
             ctx.moveTo(p.x, p.y)
             ctx.lineTo(p2.x, p2.y)
-            ctx.strokeStyle = `rgba(255,107,0,${0.1 * (1 - dist / 100)})`
+            ctx.strokeStyle = `rgba(255,107,0,${0.05 * (1 - dist / 150)})`
             ctx.lineWidth = 0.5
             ctx.stroke()
           }
