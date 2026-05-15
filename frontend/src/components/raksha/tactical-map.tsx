@@ -252,8 +252,11 @@ export function TacticalMap() {
                 icon={createPulseIcon(markerColor)}
               >
                 <Popup>
-                  <div className="p-2 min-w-[120px]">
-                    <p className="text-[10px] font-black text-[#FF6B00] mb-1 tracking-widest uppercase">SIGNAL DETECTED</p>
+                  <div className="p-2 min-w-[140px]">
+                    <div className="flex justify-between items-start mb-1">
+                      <p className="text-[10px] font-black text-[#FF6B00] tracking-widest uppercase">SIGNAL DETECTED</p>
+                      <p className="text-[9px] font-mono text-[#7B8FA8] opacity-80">{emer.case_id}</p>
+                    </div>
                     <p className="text-sm font-bold text-white mb-1 uppercase tracking-tight">{emer.intent}</p>
                     <div className="h-px w-full bg-white/10 my-2" />
                     <p className="text-[9px] text-[#7B8FA8] font-bold uppercase tracking-widest flex items-center gap-2">

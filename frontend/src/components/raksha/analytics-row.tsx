@@ -50,10 +50,10 @@ export function AnalyticsRow() {
   ] : []
 
   const incidentData = stats ? [
-    { name: "Critical", value: stats.emotion_distribution.panic, color: "#FF2D55" },
-    { name: "High", value: stats.emotion_distribution.distressed, color: "#FF6B2B" },
-    { name: "Medium", value: stats.emotion_distribution.concerned, color: "#FFD60A" },
-    { name: "Resolved", value: stats.calls_last_24h - stats.active_calls_count, color: "#00E676" },
+    { name: "Critical", value: stats.priority_distribution.critical, color: "#FF2D55" },
+    { name: "High", value: stats.priority_distribution.high, color: "#FF6B2B" },
+    { name: "Medium", value: stats.priority_distribution.medium, color: "#FFD60A" },
+    { name: "Low", value: stats.priority_distribution.low, color: "#00FF88" },
   ] : []
 
   // Mocked for visual variety but using real base numbers
@@ -75,7 +75,7 @@ export function AnalyticsRow() {
 
   return (
     <motion.div
-      className="grid grid-cols-4 gap-5 px-6 pb-6"
+      className="grid grid-cols-5 gap-4 px-6 pb-6"
       initial={{ y: 40, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ delay: 0.7, duration: 0.5 }}
@@ -145,8 +145,8 @@ export function AnalyticsRow() {
           </ResponsiveContainer>
           
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
-            <span className="text-3xl font-black text-[#FF9933] block">{stats?.calls_last_24h || 0}</span>
-            <p className="text-[9px] text-[#7B8FA8] uppercase tracking-wider">24H Cases</p>
+            <span className="text-3xl font-black text-[#FF9933] block">{stats?.active_calls_count || 0}</span>
+            <p className="text-[9px] text-[#7B8FA8] uppercase tracking-wider">Active Cases</p>
           </div>
         </div>
 
@@ -206,6 +206,40 @@ export function AnalyticsRow() {
         <div className="px-4 pb-3 flex items-center justify-center gap-2">
           <span className="text-[10px] text-[#7B8FA8]">Efficiency:</span>
           <span className="text-sm font-bold text-[#00E676]">98.2%</span>
+        </div>
+      </div>
+      </div>
+      
+      {/* Resolved Archive Card */}
+      <div className="glass-card h-[320px] flex flex-col overflow-hidden">
+        <div className="h-[3px] w-full flex-shrink-0" style={{ background: "linear-gradient(90deg, #00E676, #00C853)" }} />
+        <div className="p-4 border-b border-[rgba(0,230,118,0.15)] flex items-center gap-2">
+          <Activity size={16} className="text-[#00E676]" />
+          <h3 className="text-xs font-semibold tracking-wide text-[#F5F0FF] uppercase">Resolved Archive</h3>
+        </div>
+        
+        <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
+          <div className="w-20 h-20 rounded-full bg-[rgba(0,230,118,0.1)] flex items-center justify-center mb-4 border border-[rgba(0,230,118,0.2)]">
+            <Zap size={32} className="text-[#00E676]" />
+          </div>
+          <span className="text-4xl font-black text-white block mb-1">{stats?.resolved_count || 0}</span>
+          <p className="text-[10px] text-[#7B8FA8] font-bold uppercase tracking-[0.2em]">Cases Resolved Today</p>
+          
+          <div className="mt-6 w-full space-y-2">
+            <div className="flex justify-between items-center text-[10px]">
+              <span className="text-[#7B8FA8]">SUCCESS RATE</span>
+              <span className="text-[#00E676] font-bold">100%</span>
+            </div>
+            <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+              <div className="h-full bg-[#00E676] w-full" />
+            </div>
+          </div>
+        </div>
+        
+        <div className="p-3 border-t border-[rgba(0,230,118,0.1)] text-center">
+          <button className="text-[9px] font-black text-[#00E676] uppercase tracking-widest hover:brightness-125 transition-all">
+            View Full History
+          </button>
         </div>
       </div>
     </motion.div>

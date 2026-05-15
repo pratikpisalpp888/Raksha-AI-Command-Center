@@ -94,11 +94,18 @@ async def get_live_stats(db: AsyncSession = Depends(get_db)):
             "calls_last_24h": sum(1 for c in all_cases if c.created_at >= past_24h),
             "calls_last_7d": len(all_cases),
             "active_calls_count": sum(1 for c in all_cases if c.status not in ["resolved", "false_alarm"]),
+            "resolved_count": sum(1 for c in all_cases if c.status == "resolved" and c.created_at >= past_24h),
             "emotion_distribution": {
-                "calm": sum(1 for c in all_cases if c.created_at >= past_24h and c.emotion_level == "calm"),
-                "concerned": sum(1 for c in all_cases if c.created_at >= past_24h and c.emotion_level == "concerned"),
-                "distressed": sum(1 for c in all_cases if c.created_at >= past_24h and c.emotion_level == "distressed"),
-                "panic": sum(1 for c in all_cases if c.created_at >= past_24h and c.emotion_level == "panic"),
+                "calm": sum(1 for c in all_cases if c.created_at >= past_24h and c.emotion_level == "calm" and c.status != "resolved"),
+                "concerned": sum(1 for c in all_cases if c.created_at >= past_24h and c.emotion_level == "concerned" and c.status != "resolved"),
+                "distressed": sum(1 for c in all_cases if c.created_at >= past_24h and c.emotion_level == "distressed" and c.status != "resolved"),
+                "panic": sum(1 for c in all_cases if c.created_at >= past_24h and c.emotion_level == "panic" and c.status != "resolved"),
+            },
+            "priority_distribution": {
+                "critical": sum(1 for c in all_cases if c.created_at >= past_24h and c.priority == "critical" and c.status != "resolved"),
+                "high": sum(1 for c in all_cases if c.created_at >= past_24h and c.priority == "high" and c.status != "resolved"),
+                "medium": sum(1 for c in all_cases if c.created_at >= past_24h and c.priority == "medium" and c.status != "resolved"),
+                "low": sum(1 for c in all_cases if c.created_at >= past_24h and c.priority == "low" and c.status != "resolved"),
             },
             "avg_response_time": 45.2 
         }
@@ -109,7 +116,9 @@ async def get_live_stats(db: AsyncSession = Depends(get_db)):
         return {
             "calls_last_1h": 0, "calls_last_24h": 0, "calls_last_7d": 0,
             "active_calls_count": 0,
+            "resolved_count": 0,
             "emotion_distribution": {"calm": 0, "concerned": 0, "distressed": 0, "panic": 0},
+            "priority_distribution": {"critical": 0, "high": 0, "medium": 0, "low": 0},
             "avg_response_time": 0
         }
 
@@ -118,12 +127,13 @@ async def get_heatmap_data(db: AsyncSession = Depends(get_db)):
     """Returns data for map view from the last 24 hours."""
     try:
         past_24h = datetime.utcnow() - timedelta(hours=24)
-        # Sort by newest first
+        # Only show non-resolved cases on the map
         stmt = select(Case).where(
             and_(
                 Case.created_at >= past_24h,
                 Case.location_lat.is_not(None),
-                Case.location_lng.is_not(None)
+                Case.location_lng.is_not(None),
+                Case.status != 'resolved'
             )
         ).order_by(Case.created_at.desc())
         
