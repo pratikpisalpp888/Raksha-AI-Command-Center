@@ -58,41 +58,56 @@ function speakTranscript(text, languageHint = '') {
     const synth = window.speechSynthesis;
     synth.cancel();
 
-    const utterance = new SpeechSynthesisUtterance(text);
-    const hint = languageHint?.toLowerCase() || '';
-
     // Voice detection logic
     const hasDevanagari = /[\u0900-\u097F]/.test(text);
     const hasKannada = /[\u0C80-\u0CFF]/.test(text);
     
+    let targetLang = 'en-IN';
+    const hint = languageHint?.toLowerCase() || '';
+
     if (hasKannada || hint === 'kannada' || hint === 'kn') {
-      utterance.lang = 'kn-IN';
+      targetLang = 'kn-IN';
     } else if (hint === 'marathi' || (hasDevanagari && (text.includes('आहे') || text.includes('मी')))) {
-      utterance.lang = 'mr-IN';
+      targetLang = 'mr-IN';
     } else if (hasDevanagari || hint === 'hindi') {
-      utterance.lang = 'hi-IN';
-    } else {
-      utterance.lang = 'en-IN';
+      targetLang = 'hi-IN';
     }
 
-    utterance.rate = 0.9;
-    utterance.pitch = 1.0;
-    utterance.volume = 1.0;
-
     const startSpeaking = () => {
-      const voices = synth.getVoices();
-      const targetLang = utterance.lang.split('-')[0];
-      const regionalVoice = voices.find(v => 
-        v.lang.startsWith(targetLang) && (v.name.includes('India') || v.name.includes('Google'))
-      ) || voices.find(v => v.lang.startsWith(targetLang)) || voices[0];
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = targetLang;
+      utterance.rate = 0.9;
+      utterance.pitch = 1.0;
+      utterance.volume = 1.0;
 
-      if (regionalVoice) utterance.voice = regionalVoice;
+      const voices = synth.getVoices();
+      const langPrefix = targetLang.split('-')[0];
+      
+      // 1. Try exact language match
+      let voice = voices.find(v => v.lang.startsWith(langPrefix) && (v.name.includes('Google') || v.name.includes('India')));
+      if (!voice) voice = voices.find(v => v.lang.startsWith(langPrefix));
+      
+      // 2. Fallback for Marathi -> Hindi (Since both use Devanagari script, Hindi TTS reads Marathi perfectly)
+      if (!voice && langPrefix === 'mr') {
+        voice = voices.find(v => v.lang.startsWith('hi'));
+      }
+      
+      // CRITICAL FIX: Only set the voice if we found a matching language!
+      // If we force an English voice to read Kannada/Marathi characters, the browser outputs SILENCE.
+      // By leaving it blank, the OS will attempt to use its native cloud voices for that language.
+      if (voice) {
+        utterance.voice = voice;
+      }
+      
+      // Chrome bug workaround: keep a reference to utterance in window to prevent garbage collection mid-speech
+      window.latestUtterance = utterance;
       synth.speak(utterance);
     };
 
-    // Chrome/Safari voices might not be ready instantly
     if (synth.getVoices().length === 0) {
-      synth.onvoiceschanged = startSpeaking;
+      synth.addEventListener('voiceschanged', startSpeaking, { once: true });
+      // Safety fallback in case voiceschanged never fires
+      setTimeout(startSpeaking, 1000);
     } else {
       startSpeaking();
     }
