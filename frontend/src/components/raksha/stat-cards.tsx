@@ -74,7 +74,7 @@ export function StatCards() {
               <span className="text-[#7B8FA8] font-medium opacity-60 text-[10px]">TRAFFIC SYNC</span>
             </p>
           </div>
-          <div className="p-3 rounded-2xl bg-[rgba(255,107,0,0.1)] border border-[rgba(255,107,0,0.25)] group-hover:bg-[#FF9933]/20 transition-colors">
+          <div className="p-3 rounded-[1.2rem] bg-[rgba(255,107,0,0.1)] border border-[rgba(255,107,0,0.25)] group-hover:bg-[#FF9933]/20 transition-colors">
             <Phone className="text-[#FF9933] drop-shadow-[0_0_12px_#FF9933]" size={20} />
           </div>
         </div>
@@ -105,7 +105,7 @@ export function StatCards() {
               Neural Monitor Link: OK
             </p>
           </div>
-          <div className="p-3 rounded-2xl bg-[rgba(255,45,85,0.1)] border border-[rgba(255,45,85,0.25)] group-hover:bg-[#FF2D55]/20 transition-colors">
+          <div className="p-3 rounded-[1.2rem] bg-[rgba(255,45,85,0.1)] border border-[rgba(255,45,85,0.25)] group-hover:bg-[#FF2D55]/20 transition-colors">
             <Activity className="text-[#FF2D55] drop-shadow-[0_0_12px_#FF2D55]" size={20} />
           </div>
         </div>
@@ -141,7 +141,7 @@ export function StatCards() {
                <p className="text-[9px] text-[#00E676] font-black tracking-widest uppercase">Performance: Optimal</p>
             </div>
           </div>
-          <div className="p-3 rounded-2xl bg-[rgba(41,121,255,0.1)] border border-[rgba(41,121,255,0.25)] group-hover:bg-[#2979FF]/20 transition-colors">
+          <div className="p-3 rounded-[1.2rem] bg-[rgba(41,121,255,0.1)] border border-[rgba(41,121,255,0.25)] group-hover:bg-[#2979FF]/20 transition-colors">
             <Clock className="text-[#2979FF] drop-shadow-[0_0_12px_#2979FF]" size={20} />
           </div>
         </div>
@@ -168,7 +168,7 @@ export function StatCards() {
               {resolutionRate}% SYSTEM EFFICIENCY
             </p>
           </div>
-          <div className="p-3 rounded-2xl bg-[rgba(0,230,118,0.1)] border border-[rgba(0,230,118,0.25)] group-hover:bg-[#00E676]/20 transition-colors">
+          <div className="p-3 rounded-[1.2rem] bg-[rgba(0,230,118,0.1)] border border-[rgba(0,230,118,0.25)] group-hover:bg-[#00E676]/20 transition-colors">
             <CheckCircle className="text-[#00E676] drop-shadow-[0_0_12px_#00E676]" size={20} />
           </div>
         </div>

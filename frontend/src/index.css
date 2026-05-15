@@ -1,5 +1,5 @@
 /* Import fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -15,7 +15,7 @@ body {
   padding: 0;
   background: #030810;
   color: #F5F0FF;
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   overflow-x: hidden;
 }
 
@@ -165,13 +165,18 @@ body {
 .glass-card {
   background: rgba(4,14,30,0.85);
   border: 1px solid rgba(255,107,0,0.15);
-  border-radius: 16px;
+  border-radius: 2rem;
   backdrop-filter: blur(20px);
   box-shadow:
     0 0 0 1px rgba(255,107,0,0.05),
     0 20px 40px rgba(0,0,0,0.5),
     inset 0 1px 0 rgba(255,255,255,0.04);
   transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+
+.cyber-card {
+  @apply relative overflow-hidden bg-[rgba(3,8,16,0.6)] backdrop-blur-2xl border border-white/5 rounded-[2rem] shadow-2xl;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .glass-card:hover {

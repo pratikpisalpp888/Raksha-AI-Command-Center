@@ -114,12 +114,12 @@ export function EmergencyCases() {
           </div>
         </div>
 
-        <div className="flex gap-2 mb-4 p-1 bg-black/20 rounded-xl border border-white/5">
+        <div className="flex gap-2 mb-4 p-1 bg-black/20 rounded-[1.2rem] border border-white/5">
           {tabs.map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`flex-1 py-2 text-[9px] font-black uppercase tracking-widest rounded-lg transition-all ${
+              className={`flex-1 py-2 text-[9px] font-black uppercase tracking-widest rounded-[0.8rem] transition-all ${
                 activeTab === tab
                   ? "bg-[#FF9933]/10 text-[#FF9933] shadow-[inset_0_0_10px_rgba(255,153,51,0.1)]"
                   : "text-[#7B8FA8] hover:text-white hover:bg-white/5"
@@ -138,10 +138,10 @@ export function EmergencyCases() {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Filter by ID, location, or type..."
-              className="w-full bg-white/[0.03] border border-white/10 rounded-xl pl-9 pr-3 py-2.5 text-[11px] text-[#F5F0FF] placeholder-[#3D5068] focus:outline-none focus:border-[#FF9933]/50 focus:bg-white/[0.06] transition-all font-medium"
+              className="w-full bg-white/[0.03] border border-white/10 rounded-[1rem] pl-9 pr-3 py-2.5 text-[11px] text-[#F5F0FF] placeholder-[#3D5068] focus:outline-none focus:border-[#FF9933]/50 focus:bg-white/[0.06] transition-all font-medium"
             />
           </div>
-          <button className="p-2.5 rounded-xl bg-white/[0.03] border border-white/10 text-[#7B8FA8] hover:text-[#FF9933] hover:border-[#FF9933]/40 transition-all">
+          <button className="p-2.5 rounded-[1rem] bg-white/[0.03] border border-white/10 text-[#7B8FA8] hover:text-[#FF9933] hover:border-[#FF9933]/40 transition-all">
             <Filter size={16} />
           </button>
         </div>
