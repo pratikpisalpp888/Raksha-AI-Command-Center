@@ -11,6 +11,7 @@ export function LiveStats() {
   const [stats, setStats] = useState<any>(null)
   const [callHistory, setCallHistory] = useState<{time: string, calls: number}[]>([])
   const [currentTranscript, setCurrentTranscript] = useState("Awaiting incoming signal...")
+  const [displayedText, setDisplayedText] = useState("Awaiting incoming signal...")
   const [isTyping, setIsTyping] = useState(false)
 
   const fetchStats = useCallback(async () => {
@@ -21,6 +22,24 @@ export function LiveStats() {
       console.warn('[LiveStats] Failed to fetch live stats')
     }
   }, [])
+
+  // Typewriter Effect logic
+  useEffect(() => {
+    if (isTyping) {
+      let i = 0
+      setDisplayedText("")
+      const interval = setInterval(() => {
+        setDisplayedText(currentTranscript.slice(0, i + 1))
+        i++
+        if (i >= currentTranscript.length) {
+          clearInterval(interval)
+        }
+      }, 25) // Smooth, cinematic speed
+      return () => clearInterval(interval)
+    } else if (currentTranscript === "Awaiting incoming signal...") {
+      setDisplayedText(currentTranscript)
+    }
+  }, [currentTranscript, isTyping])
 
   // Listen for transcript events
   useEffect(() => {
@@ -171,13 +190,13 @@ export function LiveStats() {
            <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.02),rgba(0,255,0,0.01),rgba(0,0,255,0.02))] bg-[length:100%_2px,3px_100%] z-10 opacity-30" />
            <div className="relative z-20">
               <motion.p 
-                key={currentTranscript}
+                key={displayedText}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="text-[14px] font-bold text-[#F5F0FF] leading-relaxed tracking-tight font-mono italic"
+                className="text-[15px] font-bold text-[#F5F0FF] leading-relaxed tracking-tight italic"
               >
                 <span className="text-[#FF9933] mr-2">&gt;&gt;&gt;</span>
-                {currentTranscript}
+                {displayedText}
                 <span className="inline-block w-2 h-4 bg-[#FF9933] ml-1 animate-pulse" />
               </motion.p>
            </div>

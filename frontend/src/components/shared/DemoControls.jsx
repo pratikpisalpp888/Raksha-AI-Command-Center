@@ -55,46 +55,52 @@ function playSuccessSound() {
 // ── Speak transcript using browser TTS (multilingual) ────────────────────────
 function speakTranscript(text, languageHint = '') {
   try {
-    window.speechSynthesis.cancel()
-    const utterance = new SpeechSynthesisUtterance(text)
+    const synth = window.speechSynthesis;
+    synth.cancel();
 
-    // 1. Script-based detection (most reliable for native scripts)
-    const hasDevanagari = /[\u0900-\u097F]/.test(text)
-    const hasKannada = /[\u0C80-\u0CFF]/.test(text)
+    const utterance = new SpeechSynthesisUtterance(text);
+    const hint = languageHint?.toLowerCase() || '';
+
+    // Voice detection logic
+    const hasDevanagari = /[\u0900-\u097F]/.test(text);
+    const hasKannada = /[\u0C80-\u0CFF]/.test(text);
     
-    // 2. Hint-based detection (from backend)
-    const hint = languageHint?.toLowerCase() || ''
-    
-    // 3. Logic to determine language
     if (hasKannada || hint === 'kannada' || hint === 'kn') {
-      utterance.lang = 'kn-IN'
-    } else if (hint === 'marathi' || (hasDevanagari && (text.includes('आहे') || text.includes('मी') || text.includes('माझे')))) {
-      utterance.lang = 'mr-IN'
-    } else if (hasDevanagari || hint === 'hindi' || hint === 'hinglish') {
-      utterance.lang = 'hi-IN'
+      utterance.lang = 'kn-IN';
+    } else if (hint === 'marathi' || (hasDevanagari && (text.includes('आहे') || text.includes('मी')))) {
+      utterance.lang = 'mr-IN';
+    } else if (hasDevanagari || hint === 'hindi') {
+      utterance.lang = 'hi-IN';
     } else {
-      utterance.lang = 'en-IN'
+      utterance.lang = 'en-IN';
     }
 
-    utterance.rate = 0.9 
-    utterance.pitch = 1.1
-    utterance.volume = 1.0
+    utterance.rate = 0.9;
+    utterance.pitch = 1.0;
+    utterance.volume = 1.0;
 
-    // Pick best available voice for the detected language
-    const voices = window.speechSynthesis.getVoices()
-    const targetLang = utterance.lang.split('-')[0]
-    
-    const regionalVoice = voices.find(v =>
-      v.lang.startsWith(targetLang) && (v.name.includes('India') || v.name.includes('Google'))
-    ) || voices.find(v => v.lang.startsWith(targetLang)) || voices[0]
-    
-    if (regionalVoice) utterance.voice = regionalVoice
+    const startSpeaking = () => {
+      const voices = synth.getVoices();
+      const targetLang = utterance.lang.split('-')[0];
+      const regionalVoice = voices.find(v => 
+        v.lang.startsWith(targetLang) && (v.name.includes('India') || v.name.includes('Google'))
+      ) || voices.find(v => v.lang.startsWith(targetLang)) || voices[0];
 
-    window.speechSynthesis.speak(utterance)
-    return true
+      if (regionalVoice) utterance.voice = regionalVoice;
+      synth.speak(utterance);
+    };
+
+    // Chrome/Safari voices might not be ready instantly
+    if (synth.getVoices().length === 0) {
+      synth.onvoiceschanged = startSpeaking;
+    } else {
+      startSpeaking();
+    }
+    
+    return true;
   } catch (e) {
-    console.error('Speech synthesis error:', e)
-    return false
+    console.error('Speech error:', e);
+    return false;
   }
 }
 
