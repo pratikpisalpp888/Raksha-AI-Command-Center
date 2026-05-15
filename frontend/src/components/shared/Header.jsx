@@ -1,4 +1,4 @@
-import { Shield, LogOut, Clock, Calendar, LayoutDashboard, PhoneCall, PieChart, Activity } from 'lucide-react'
+import { Shield, LogOut, LayoutDashboard, PhoneCall, PieChart, RotateCcw } from 'lucide-react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useState, useEffect } from 'react'
@@ -22,6 +22,14 @@ export default function Header() {
   ]
   
   const isActive = (path) => location.pathname.startsWith(path)
+  const isDashboard = location.pathname === '/dashboard'
+
+  const [resetting, setResetting] = useState(false)
+  const resetDashboard = () => {
+    setResetting(true)
+    window.dispatchEvent(new CustomEvent('raksha-reset'))
+    setTimeout(() => setResetting(false), 1500)
+  }
 
   return (
     <header className="sticky top-0 z-[100] backdrop-blur-xl border-b border-white/5" style={{
@@ -97,7 +105,25 @@ export default function Header() {
         )}
         
         {/* Actions & Info Section */}
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4">
+
+          {/* Dashboard Reset Button — only on dashboard */}
+          {agent && isDashboard && (
+            <motion.button
+              onClick={resetDashboard}
+              whileTap={{ scale: 0.93 }}
+              title="Reset all dashboard cards to zero"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 border"
+              style={{
+                background: resetting ? 'rgba(255,45,85,0.15)' : 'rgba(255,255,255,0.03)',
+                borderColor: resetting ? 'rgba(255,45,85,0.5)' : 'rgba(255,255,255,0.08)',
+                color: resetting ? '#FF2D55' : '#7B8FA8',
+              }}
+            >
+              <RotateCcw size={13} className={resetting ? 'animate-spin' : ''} />
+              {resetting ? 'Clearing...' : 'Reset View'}
+            </motion.button>
+          )}
           {/* Real-time Clock Module */}
           <div className="hidden xl:flex items-center gap-4 px-6 py-2.5 bg-gradient-to-b from-white/[0.05] to-transparent rounded-[1.2rem] border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.3)] group hover:border-[#FF9933]/30 transition-all duration-500">
             <div className="flex flex-col items-end border-r border-white/10 pr-4">
