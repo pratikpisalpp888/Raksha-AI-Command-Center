@@ -30,26 +30,36 @@ export default function Header() {
       <div className="max-w-[1600px] mx-auto flex items-center justify-between px-8 h-20">
         
         {/* Brand Section */}
-        <div className="flex items-center gap-4 cursor-pointer" onClick={() => navigate('/')}>
+        <div 
+          className="flex items-center gap-4 cursor-pointer group" 
+          onClick={() => navigate('/')}
+        >
           <div className="relative">
+            <motion.div
+              animate={{ opacity: [0.4, 1, 0.4] }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute inset-0 bg-[#FF9933] blur-xl opacity-20"
+            />
             <Shield 
               size={32} 
-              className="text-[#FF9933] drop-shadow-[0_0_15px_rgba(255,153,51,0.5)]"
+              className="text-[#FF9933] drop-shadow-[0_0_15px_rgba(255,153,51,0.5)] relative z-10 transition-transform group-hover:scale-110 duration-500"
               fill="rgba(255,153,51,0.15)"
             />
           </div>
-          <div>
-            <h1 className="font-black tracking-[0.15em] text-xl leading-none"
+          <div className="relative">
+            <h1 className="font-black tracking-[0.15em] text-xl leading-none transition-all duration-500 group-hover:tracking-[0.2em]"
               style={{
-                background: 'linear-gradient(135deg, #FF9933 0%, #FFFFFF 50%, #FF9933 100%)',
+                background: 'linear-gradient(90deg, #FF9933, #FFFFFF, #138808, #FF9933)',
+                backgroundSize: '200% auto',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
+                animation: 'text-shimmer 4s linear infinite'
               }}
             >
               RAKSHA AI
             </h1>
-            <p className="text-[9px] tracking-[0.2em] font-bold text-[#3D5068] uppercase mt-1">
+            <p className="text-[9px] tracking-[0.2em] font-black text-[#3D5068] uppercase mt-1 group-hover:text-[#7B8FA8] transition-colors">
               National Command Center
             </p>
           </div>
