@@ -59,6 +59,12 @@ export default function DashboardPage() {
         </div>
       </motion.div>
 
+      {/* Global System Status Indicator */}
+      <div className="fixed bottom-6 left-6 z-[2000] flex items-center gap-3 px-4 py-2 bg-[#030810]/80 backdrop-blur-xl border border-white/5 rounded-full shadow-2xl pointer-events-none">
+        <div className="w-2 h-2 rounded-full bg-[#00E676] status-led shadow-[0_0_10px_#00E676]" />
+        <span className="text-[9px] font-black tracking-[0.3em] text-white/40 uppercase">System Status: Operational</span>
+      </div>
+
       {/* Demo Controls Panel — Fixed bottom-right, always visible */}
       <DemoControls />
 

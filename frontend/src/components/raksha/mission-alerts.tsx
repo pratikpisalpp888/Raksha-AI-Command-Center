@@ -111,7 +111,7 @@ export function MissionAlerts() {
 
   return (
     <motion.div
-      className="cyber-card h-[520px] flex flex-col overflow-hidden relative border border-white/5 shadow-2xl"
+      className="cyber-card h-[520px] flex flex-col overflow-hidden relative border border-white/5 shadow-2xl rounded-[2rem]"
       initial={{ x: 60, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ delay: 0.5, duration: 0.5 }}
@@ -127,11 +127,14 @@ export function MissionAlerts() {
 
       <div className="p-5 border-b border-white/10 bg-gradient-to-r from-white/[0.03] to-transparent">
         <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-[10px] font-black tracking-[0.4em] text-white uppercase neon-text-orange mb-1">
-               MISSION ALERTS
-            </h3>
-            <p className="text-[8px] text-[#7B8FA8] font-bold tracking-[0.2em] uppercase opacity-60">Global Threat Monitoring</p>
+          <div className="flex items-center gap-3">
+            <div className="w-2 h-2 rounded-full bg-[#FF9933] status-led shadow-[0_0_8px_#FF9933]" />
+            <div>
+              <h3 className="text-[10px] font-black tracking-[0.4em] text-white uppercase neon-text-orange mb-1">
+                 MISSION ALERTS
+              </h3>
+              <p className="text-[8px] text-[#7B8FA8] font-bold tracking-[0.2em] uppercase opacity-60">Global Threat Monitoring</p>
+            </div>
           </div>
           <div className="flex items-center gap-3">
             <button 
@@ -167,7 +170,7 @@ export function MissionAlerts() {
             <motion.div
               key={alert.id}
               onClick={() => navigate(`/case/${alert.caseId}`)}
-              className={`group relative p-4 rounded-2xl bg-gradient-to-br from-white/[0.03] to-transparent border border-white/5 transition-all cursor-pointer hover:border-white/20 hover:bg-white/[0.05] overflow-hidden ${alertStyles[alert.type].glow}`}
+              className={`group relative p-4 rounded-[1.5rem] bg-gradient-to-br from-white/[0.03] to-transparent border border-white/5 transition-all cursor-pointer hover:border-white/20 hover:bg-white/[0.05] overflow-hidden ${alertStyles[alert.type].glow}`}
               initial={{ x: 50, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: -50, opacity: 0 }}
@@ -213,10 +216,10 @@ export function MissionAlerts() {
       </div>
 
       <div className="p-4 border-t border-white/5 bg-black/20 grid grid-cols-2 gap-3">
-        <button className="flex items-center justify-center gap-3 py-3 rounded-xl bg-white/[0.02] border border-white/5 text-[10px] font-black text-[#FF9933] tracking-[0.2em] hover:bg-[#FF9933]/10 hover:border-[#FF9933]/30 transition-all uppercase group">
+        <button className="flex items-center justify-center gap-3 py-3 rounded-[1.2rem] bg-white/[0.02] border border-white/5 text-[10px] font-black text-[#FF9933] tracking-[0.2em] hover:bg-[#FF9933]/10 hover:border-[#FF9933]/30 transition-all uppercase group">
           <Phone size={14} className="group-hover:rotate-12 transition-transform" /> CALL BACKUP
         </button>
-        <button className="flex items-center justify-center gap-3 py-3 rounded-xl bg-white/[0.02] border border-white/5 text-[10px] font-black text-[#FF9933] tracking-[0.2em] hover:bg-[#FF9933]/10 hover:border-[#FF9933]/30 transition-all uppercase group">
+        <button className="flex items-center justify-center gap-3 py-3 rounded-[1.2rem] bg-white/[0.02] border border-white/5 text-[10px] font-black text-[#FF9933] tracking-[0.2em] hover:bg-[#FF9933]/10 hover:border-[#FF9933]/30 transition-all uppercase group">
           <MapPin size={14} className="group-hover:scale-110 transition-transform" /> LOCATE ALL
         </button>
       </div>

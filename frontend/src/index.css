@@ -19,23 +19,37 @@ body {
   overflow-x: hidden;
 }
 
-/* Custom scrollbar */
+/* Custom cyber scrollbar - ultra thin and premium */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 4px;
+  height: 4px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(4,14,30,0.5);
+  background: rgba(3, 8, 16, 0.5);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 107, 0, 0.2);
-  border-radius: 10px;
+  background: rgba(255, 153, 51, 0.15);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 153, 51, 0.05);
+  transition: all 0.3s;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 107, 0, 0.4);
+  background: rgba(255, 153, 51, 0.4);
+  box-shadow: 0 0 10px rgba(255, 153, 51, 0.2);
+}
+
+@keyframes led-flicker {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.9); }
+  70% { opacity: 1; transform: scale(1.1); }
+  80% { opacity: 0.8; transform: scale(1); }
+}
+
+.status-led {
+  animation: led-flicker 4s infinite;
 }
 
 @layer base {
