@@ -208,7 +208,6 @@ export function AnalyticsRow() {
           <span className="text-sm font-bold text-[#00E676]">98.2%</span>
         </div>
       </div>
-      </div>
       
       {/* Resolved Archive Card */}
       <div className="glass-card h-[320px] flex flex-col overflow-hidden">
