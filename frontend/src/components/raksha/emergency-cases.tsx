@@ -48,7 +48,7 @@ export function EmergencyCases() {
     try {
       const params: Record<string, any> = { limit: 50 }
       if (activeTab === "critical") params.priority = "critical"
-      else if (activeTab === "active") params.status = "ai_processing"
+      else if (activeTab === "active") params.status = "new"
       else if (activeTab === "resolved") params.status = "resolved"
 
       const data = await getCases(params)

@@ -75,49 +75,54 @@ export function AnalyticsRow() {
 
   return (
     <motion.div
-      className="grid grid-cols-5 gap-4 px-6 pb-6"
+      className="grid grid-cols-4 gap-6 px-6 pb-6"
       initial={{ y: 40, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ delay: 0.7, duration: 0.5 }}
     >
-      {/* Emotion Intelligence Card */}
+      {/* System Status Card (Replaces Redundant Emotion Card) */}
       <div className="glass-card h-[320px] flex flex-col overflow-hidden">
-        <div className="h-[3px] w-full flex-shrink-0" style={{ background: "linear-gradient(90deg, #FF2D55, #FF6B2B, #FFD60A, #00E676)" }} />
+        <div className="h-[3px] w-full flex-shrink-0" style={{ background: "linear-gradient(90deg, #FF9933, #FF2D55)" }} />
         <div className="p-4 border-b border-[rgba(255,107,0,0.15)] flex items-center gap-2 flex-shrink-0">
-          <Brain size={16} className="text-[#FF6B2B]" />
-          <h3 className="text-xs font-semibold tracking-wide text-[#F5F0FF] uppercase">Emotion Intelligence</h3>
+          <Activity size={16} className="text-[#FF9933]" />
+          <h3 className="text-xs font-semibold tracking-wide text-[#F5F0FF] uppercase">System Performance</h3>
         </div>
         
-        <div className="flex-1 p-4 space-y-3 overflow-hidden">
-          {emotionData.map((item, index) => (
-            <div key={item.emotion} className="space-y-1.5">
-              <div className="flex justify-between text-xs">
-                <span className="text-[#F5F0FF] font-medium">{item.emotion}</span>
-                <span className="text-[#7B8FA8] font-mono">{item.value}%</span>
-              </div>
-              <div className="h-2.5 rounded-full bg-[rgba(255,107,0,0.08)] overflow-hidden relative">
-                <motion.div
-                  className="h-full rounded-full"
-                  style={{ backgroundColor: item.color }}
-                  initial={{ width: 0 }}
-                  animate={{ width: `${item.value}%` }}
-                  transition={{ duration: 1 }}
-                />
-              </div>
+        <div className="flex-1 p-6 flex flex-col justify-center">
+            <div className="space-y-6">
+                <div>
+                    <div className="flex justify-between text-[10px] mb-2">
+                        <span className="text-[#7B8FA8] uppercase font-bold tracking-widest">Neural Accuracy</span>
+                        <span className="text-[#00E676] font-mono">99.4%</span>
+                    </div>
+                    <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                        <motion.div className="h-full bg-[#00E676]" initial={{ width: 0 }} animate={{ width: '99.4%' }} transition={{ duration: 2 }} />
+                    </div>
+                </div>
+                <div>
+                    <div className="flex justify-between text-[10px] mb-2">
+                        <span className="text-[#7B8FA8] uppercase font-bold tracking-widest">Network Stability</span>
+                        <span className="text-[#2979FF] font-mono">100%</span>
+                    </div>
+                    <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                        <motion.div className="h-full bg-[#2979FF]" initial={{ width: 0 }} animate={{ width: '100%' }} transition={{ duration: 2 }} />
+                    </div>
+                </div>
+                <div>
+                    <div className="flex justify-between text-[10px] mb-2">
+                        <span className="text-[#7B8FA8] uppercase font-bold tracking-widest">Language Detection</span>
+                        <span className="text-[#FFD60A] font-mono">98.2%</span>
+                    </div>
+                    <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                        <motion.div className="h-full bg-[#FFD60A]" initial={{ width: 0 }} animate={{ width: '98.2%' }} transition={{ duration: 2 }} />
+                    </div>
+                </div>
             </div>
-          ))}
-
-          {stats?.emotion_distribution.panic > 0 && (
-            <motion.div
-              className="mt-3 p-3 rounded-lg border border-[#FF2D55] bg-[rgba(255,45,85,0.08)]"
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            >
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-[#FF2D55] animate-pulse" />
-                <p className="text-[10px] text-[#FF2D55] font-medium">PANIC DETECTED - Response units alerted</p>
-              </div>
-            </motion.div>
-          )}
+            
+            <div className="mt-8 pt-6 border-t border-white/5 flex items-center justify-between">
+                <span className="text-[10px] text-[#7B8FA8] uppercase font-bold tracking-widest">Current Status</span>
+                <span className="text-[10px] text-[#00E676] font-black uppercase tracking-widest animate-pulse">Optimal</span>
+            </div>
         </div>
       </div>
 
@@ -182,30 +187,6 @@ export function AnalyticsRow() {
               <Area type="monotone" dataKey="avgTime" stroke="#FF9933" fill="rgba(255,153,51,0.1)" name="Avg (min)" />
             </AreaChart>
           </ResponsiveContainer>
-        </div>
-      </div>
-
-      {/* AI Performance Radar */}
-      <div className="glass-card h-[320px] flex flex-col overflow-hidden">
-        <div className="h-[3px] w-full flex-shrink-0" style={{ background: "linear-gradient(90deg, #FF6B00, #2979FF, #00E676)" }} />
-        <div className="p-4 border-b border-[rgba(255,107,0,0.15)] flex items-center gap-2">
-          <Globe size={16} className="text-[#00E676]" />
-          <h3 className="text-xs font-semibold tracking-wide text-[#F5F0FF] uppercase">AI Health</h3>
-        </div>
-        
-        <div className="flex-1 p-2">
-          <ResponsiveContainer width="100%" height="100%">
-            <RadarChart data={aiPerformanceData}>
-              <PolarGrid stroke="rgba(255,107,0,0.15)" />
-              <PolarAngleAxis dataKey="subject" tick={{ fill: '#7B8FA8', fontSize: 8 }} />
-              <Radar name="Perf" dataKey="A" stroke="#FF9933" fill="#FF9933" fillOpacity={0.25} />
-            </RadarChart>
-          </ResponsiveContainer>
-        </div>
-
-        <div className="px-4 pb-3 flex items-center justify-center gap-2">
-          <span className="text-[10px] text-[#7B8FA8]">Efficiency:</span>
-          <span className="text-sm font-bold text-[#00E676]">98.2%</span>
         </div>
       </div>
       

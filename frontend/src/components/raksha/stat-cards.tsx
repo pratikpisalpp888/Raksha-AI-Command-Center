@@ -54,7 +54,7 @@ export function StatCards() {
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 p-6 relative z-10">
       {/* Card 1: Total Calls */}
       <motion.div
-        className="cyber-card p-6 bg-gradient-to-br from-white/[0.05] to-transparent border-t-white/10 hover:border-[#FF9933]/40 transition-all duration-500 group"
+        className="cyber-card p-6 bg-gradient-to-br from-white/[0.05] to-transparent border-t-white/10 hover:border-[#FF9933]/40 transition-all duration-500 group hover:scale-[1.03] hover:-translate-y-3 hover:shadow-[0_20px_50px_rgba(255,153,51,0.2)] cursor-default"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.1, duration: 0.5 }}
@@ -82,7 +82,7 @@ export function StatCards() {
 
       {/* Card 2: Active Now */}
       <motion.div
-        className="cyber-card p-6 bg-gradient-to-br from-white/[0.05] to-transparent border-t-white/10 hover:border-[#FF2D55]/40 transition-all duration-500 group"
+        className="cyber-card p-6 bg-gradient-to-br from-white/[0.05] to-transparent border-t-white/10 hover:border-[#FF2D55]/40 transition-all duration-500 group hover:scale-[1.03] hover:-translate-y-3 hover:shadow-[0_20px_50px_rgba(255,45,85,0.2)] cursor-default"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2, duration: 0.5 }}
@@ -113,7 +113,7 @@ export function StatCards() {
 
       {/* Card 3: Response Time */}
       <motion.div
-        className="cyber-card p-6 bg-gradient-to-br from-white/[0.05] to-transparent border-t-white/10 hover:border-[#2979FF]/40 transition-all duration-500 group"
+        className="cyber-card p-6 bg-gradient-to-br from-white/[0.05] to-transparent border-t-white/10 hover:border-[#2979FF]/40 transition-all duration-500 group hover:scale-[1.03] hover:-translate-y-3 hover:shadow-[0_20px_50px_rgba(41,121,255,0.2)] cursor-default"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.3, duration: 0.5 }}
@@ -149,7 +149,7 @@ export function StatCards() {
 
       {/* Card 4: Resolved */}
       <motion.div
-        className="cyber-card p-6 bg-gradient-to-br from-white/[0.05] to-transparent border-t-white/10 hover:border-[#00E676]/40 transition-all duration-500 group"
+        className="cyber-card p-6 bg-gradient-to-br from-white/[0.05] to-transparent border-t-white/10 hover:border-[#00E676]/40 transition-all duration-500 group hover:scale-[1.03] hover:-translate-y-3 hover:shadow-[0_20px_50px_rgba(0,230,118,0.2)] cursor-default"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.4, duration: 0.5 }}
@@ -188,7 +188,6 @@ export function StatCards() {
               transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
               initial={{ width: "0%" }}
             >
-              {/* Glowing tip */}
               <div
                 className="absolute right-0 top-1/2 -translate-y-1/2 h-4 w-4 rounded-full bg-white blur-[4px]"
                 style={{ opacity: 0.5 }}
