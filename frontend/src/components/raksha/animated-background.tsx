@@ -63,10 +63,10 @@ export function AnimatedBackground() {
           const dx = x - mouseRef.current.x
           const dy = y - mouseRef.current.y
           const dist = Math.sqrt(dx * dx + dy * dy)
-          const opacity = Math.max(0.02, 0.2 * (1 - dist / 300))
+          const opacity = Math.max(0.06, 0.4 * (1 - dist / 350))
           
           ctx.beginPath()
-          ctx.arc(x, y, 1, 0, Math.PI * 2)
+          ctx.arc(x, y, 1.2, 0, Math.PI * 2)
           ctx.fillStyle = `rgba(255, 153, 51, ${opacity})`
           ctx.fill()
         }

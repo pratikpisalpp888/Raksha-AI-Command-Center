@@ -67,8 +67,8 @@ export function EmergencyCases() {
       console.log("[EmergencyCases] New case received via WS:", newCase)
       setCases(prev => [newCase, ...prev])
       setLastUpdated(new Date())
-      // Trigger global panic effect
-      window.dispatchEvent(new CustomEvent('raksha-emergency'))
+      // Trigger global panic effect ONLY for critical
+      window.dispatchEvent(new CustomEvent('raksha-emergency', { detail: { priority: newCase.priority } }))
     },
     onStatusUpdate: () => fetchCases()
   })

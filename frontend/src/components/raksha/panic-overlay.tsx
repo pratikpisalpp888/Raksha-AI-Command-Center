@@ -8,20 +8,20 @@ export function PanicOverlay() {
 
   useEffect(() => {
     // Listen for custom "emergency" event triggered by the WebSocket or Simulation
-    const handleEmergency = () => {
-      setShowPanic(true)
-      // Flash for 2 seconds
-      setTimeout(() => setShowPanic(false), 2000)
+    const handleEmergency = (e: any) => {
+      const priority = e.detail?.priority
+      // ONLY trigger for critical emergencies
+      if (priority === 'critical') {
+        setShowPanic(true)
+        // Flash for 2.5 seconds for maximum impact
+        setTimeout(() => setShowPanic(false), 2500)
+      }
     }
 
     window.addEventListener('raksha-emergency', handleEmergency)
-    
-    // Also trigger once on first load for dramatic effect
-    const initialTimer = setTimeout(handleEmergency, 3000)
 
     return () => {
       window.removeEventListener('raksha-emergency', handleEmergency)
-      clearTimeout(initialTimer)
     }
   }, [])
 
